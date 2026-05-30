@@ -100,9 +100,6 @@ async function handleNavigation(path) {
     // Home page has special rendering
     if (path === 'README.md') {
       contentEl.innerHTML = renderHomePage(mdContent, contentIndex);
-      setTimeout(() => {
-        initSkillTree(contentIndex);
-      }, 0);
     } else {
       contentEl.innerHTML = renderMarkdown(mdContent, path);
     }
@@ -152,67 +149,155 @@ function postRender(path) {
 // ── Home Page ────────────────────────────────────────────────────
 
 function renderHomePage(mdContent, index) {
-  const renderedMd = renderMarkdown(mdContent, 'README.md');
-
-  // Build section cards
-  let sectionCards = '';
-  if (index.sections) {
-    sectionCards = index.sections.map(section => {
-      const fileCount = countSectionFiles(section);
-      const href = section.files && section.files.length > 0
-        ? '#/' + section.files[0].path.replace(/\.md$/, '')
-        : '#/';
-      return (
-        `<a class="section-card" href="${href}">` +
-          `<div class="section-card-icon">${section.icon || '📁'}</div>` +
-          `<div class="section-card-title">${section.title}</div>` +
-          `<div class="section-card-count">${fileCount} bài viết</div>` +
-        `</a>`
-      );
-    }).join('');
+  // Compute progress for a section (sum of its files' checkbox states)
+  function secProgress(sectionId) {
+    const section = (index.sections || []).find(s => s.id === sectionId);
+    if (!section) return { pct: 0, checked: 0, total: 0, files: 0 };
+    const files = [...(section.files || [])];
+    (section.subsections || []).forEach(sub => files.push(...(sub.files || [])));
+    let total = 0, checked = 0;
+    files.forEach(f => {
+      const n = f.checkboxCount || 0;
+      total += n;
+      for (let i = 0; i < n; i++) if (getCheckboxState(f.path, i)) checked++;
+    });
+    const pct = total ? Math.round((checked / total) * 100) : 0;
+    return { pct, checked, total, files: files.length };
+  }
+  function secHref(sectionId) {
+    const section = (index.sections || []).find(s => s.id === sectionId);
+    if (section && section.files && section.files.length) {
+      return '#/' + section.files[0].path.replace(/\.md$/, '');
+    }
+    return '#/';
+  }
+  function secCount(sectionId) {
+    const section = (index.sections || []).find(s => s.id === sectionId);
+    return section ? countSectionFiles(section) : 0;
   }
 
-  // Build timeline (career progression)
-  const timelineLevels = [
-    { icon: '🌱', title: 'Intern', duration: '0-3 tháng', desc: 'Học cơ bản Unity, C# và workflow' },
-    { icon: '🌿', title: 'Fresher', duration: '3-6 tháng', desc: 'Nắm vững core systems và patterns' },
-    { icon: '🌳', title: 'Junior', duration: '6-12 tháng', desc: 'Xây dựng dự án hoàn chỉnh' },
-    { icon: '🌲', title: 'Mid-Level', duration: '1-2 năm', desc: 'Architecture và optimization' },
-    { icon: '🏔️', title: 'Senior', duration: '2+ năm', desc: 'Hệ thống phức tạp và mentoring' },
+  // ── Main campaign levels ──────────────────────────────────────
+  const levels = [
+    { n: 1, id: '01-Intern',    icon: '🌱', title: 'Intern',    dur: '0–6 tháng',   desc: 'Nền tảng C#, Unity Editor, vòng đời MonoBehaviour. Tự làm 2–3 game nhỏ hoàn chỉnh.' },
+    { n: 2, id: '02-Junior',    icon: '🌿', title: 'Junior',    dur: '6–18 tháng',  desc: 'Clean code, design patterns, ScriptableObject. Làm việc trên codebase có sẵn.' },
+    { n: 3, id: '03-Mid-Level', icon: '🌳', title: 'Mid-Level', dur: '1.5–3 năm',   desc: 'Kiến trúc SOLID, DI, Addressables, tối ưu hiệu năng. Tự dựng hệ thống lớn.' },
+    { n: 4, id: '04-Senior',    icon: '🏔️', title: 'Senior',    dur: '3–6+ năm',    desc: 'Internals engine, dẫn dắt kỹ thuật, phán đoán & kiến trúc hệ thống sống lâu.' },
   ];
 
-  const timeline = timelineLevels.map(level => (
-    `<div class="timeline-item">` +
-      `<div class="timeline-icon">${level.icon}</div>` +
-      `<div class="timeline-content">` +
-        `<div class="timeline-title">${level.title}</div>` +
-        `<div class="timeline-duration">${level.duration}</div>` +
-        `<div class="timeline-desc">${level.desc}</div>` +
+  // Determine the active level = first not-completed
+  let activeIdx = levels.findIndex(l => secProgress(l.id).pct < 100);
+  if (activeIdx === -1) activeIdx = levels.length - 1;
+
+  const levelCards = levels.map((l, i) => {
+    const p = secProgress(l.id);
+    const stateCls = p.pct >= 100 ? 'is-done' : (i === activeIdx ? 'is-active' : '');
+    const stateIcon = p.pct >= 100 ? '✅' : (i === activeIdx ? '🎯' : '🔒');
+    return (
+      `<a class="gm-level lvl-${l.n} ${stateCls}" href="${secHref(l.id)}">` +
+        `<div class="gm-level-top">` +
+          `<span class="gm-level-num">Level ${l.n}</span>` +
+          `<span class="gm-level-state" title="${p.pct >= 100 ? 'Hoàn thành' : (i === activeIdx ? 'Đang học' : 'Sắp tới')}">${stateIcon}</span>` +
+        `</div>` +
+        `<div class="gm-level-icon">${l.icon}</div>` +
+        `<div class="gm-level-title">${l.title}</div>` +
+        `<div class="gm-level-dur">${l.dur}</div>` +
+        `<div class="gm-level-desc">${escapeHtml(l.desc)}</div>` +
+        `<div class="gm-level-foot">` +
+          `<div class="gm-level-bar"><div class="gm-level-bar-fill" style="width:${p.pct}%"></div></div>` +
+          `<div class="gm-level-meta"><span>${secCount(l.id)} bài</span><span>${p.pct}%</span></div>` +
+          `<div class="gm-level-cta">Vào học →</div>` +
+        `</div>` +
+      `</a>`
+    );
+  }).join('');
+
+  // ── Expansion zones ───────────────────────────────────────────
+  const zones = [
+    { id: '00-Overview',                icon: '🧭', title: 'Tổng Quan & Định Hướng', desc: 'Cách học, hướng nghề, cách tự đánh giá level.' },
+    { id: '08-Knowledge-Base',          icon: '📚', title: 'Knowledge Base',          desc: 'Giải thích bản chất từng khái niệm — kiểu Unity Docs tiếng Việt.' },
+    { id: '05-Technical-Deep-Dives',    icon: '🔬', title: 'Technical Deep Dives',    desc: 'Performance, architecture, rendering, multiplayer, tools.' },
+    { id: '06-Indie-Track',             icon: '🎨', title: 'Indie Track',             desc: 'Game design, art, scope, marketing, phát hành & kinh doanh.' },
+    { id: '07-Interview-and-Portfolio', icon: '💼', title: 'Interview & Portfolio',   desc: 'Chuẩn bị phỏng vấn, xây portfolio, thị trường & lương.' },
+  ];
+  let zoneCards = zones.map(z => (
+    `<a class="gm-zone" href="${secHref(z.id)}">` +
+      `<div class="gm-zone-icon">${z.icon}</div>` +
+      `<div class="gm-zone-body">` +
+        `<div class="gm-zone-title">${z.title}</div>` +
+        `<div class="gm-zone-desc">${escapeHtml(z.desc)}</div>` +
+        `<span class="gm-zone-count">${secCount(z.id)} bài viết</span>` +
       `</div>` +
+    `</a>`
+  )).join('');
+  // Book library zone (custom route)
+  if (index.books && Object.keys(index.books).length) {
+    let bookCount = 0;
+    Object.values(index.books).forEach(arr => { bookCount += (arr || []).length; });
+    zoneCards += (
+      `<a class="gm-zone" href="#/book/library">` +
+        `<div class="gm-zone-icon">📖</div>` +
+        `<div class="gm-zone-body">` +
+          `<div class="gm-zone-title">Tủ Sách Lập Trình</div>` +
+          `<div class="gm-zone-desc">Kho sách & tài liệu PDF Unity / Game Dev, đọc ngay trên web.</div>` +
+          `<span class="gm-zone-count">${bookCount} cuốn sách</span>` +
+        `</div>` +
+      `</a>`
+    );
+  }
+
+  // ── Learning tips ─────────────────────────────────────────────
+  const tips = [
+    { icon: '🎯', title: 'Học theo dự án', text: '70% thời gian tự làm dự án. Mỗi level có dự án bắt buộc — không có dự án = chưa học.' },
+    { icon: '📊', title: 'Đánh giá theo năng lực', text: 'Lên level khi LÀM ĐƯỢC việc, không phải khi đủ tháng. Phạm vi & độ độc lập mới quyết định.' },
+    { icon: '🧠', title: 'Hiểu "tại sao"', text: 'Senior khác Junior ở chỗ hiểu bản chất. Mỗi tính năng: nó giải vấn đề gì? Đánh đổi gì?' },
+  ];
+  const tipCards = tips.map(t => (
+    `<div class="gm-tip">` +
+      `<div class="gm-tip-icon">${t.icon}</div>` +
+      `<div class="gm-tip-title">${t.title}</div>` +
+      `<div class="gm-tip-text">${escapeHtml(t.text)}</div>` +
     `</div>`
   )).join('');
 
+  const tp = getTotalProgress(index);
+
   return (
-    `<div class="home-hero">` +
-      `<h1 class="home-title">🎮 Lộ Trình Unity Developer</h1>` +
-      `<p class="home-subtitle">Từ Intern đến Senior — Tài liệu toàn diện bằng Tiếng Việt</p>` +
-      `<div class="home-roadmap-container">` +
-        `<div class="home-progress-summary" style="margin-bottom: 24px;">` +
-          `<span class="home-progress-label">Tiến độ tổng thể</span>` +
-          `<span class="home-progress-value" id="home-progress-value">${getProgressText()}</span>` +
+    `<div class="gm">` +
+      // HERO
+      `<section class="gm-hero">` +
+        `<span class="gm-badge">Lộ trình Unity Developer</span>` +
+        `<h1 class="gm-title">Từ Intern đến Senior</h1>` +
+        `<p class="gm-subtitle">Một hành trình học Unity bài bản bằng Tiếng Việt — Technical chuyên sâu, đi làm studio & làm game Indie. Chọn level để bắt đầu cuộc phiêu lưu của bạn.</p>` +
+        `<div class="gm-xp">` +
+          `<div class="gm-xp-top">` +
+            `<span class="gm-xp-label">Tiến độ tổng thể</span>` +
+            `<span class="gm-xp-value" id="home-progress-value">${tp.totalChecked}/${tp.totalCheckboxes} (${tp.percentage}%)</span>` +
+          `</div>` +
+          `<div class="gm-xp-track"><div class="gm-xp-fill" style="width:${tp.percentage}%"></div></div>` +
         `</div>` +
-        `<div id="interactive-skill-tree" class="skill-tree-box"></div>` +
-      `</div>` +
-    `</div>` +
-    `<div class="home-sections">` +
-      `<h2 class="home-sections-title">📚 Các Phần Chính</h2>` +
-      `<div class="home-sections-grid">${sectionCards}</div>` +
-    `</div>` +
-    `<div class="home-timeline">` +
-      `<h2>⏱️ Timeline Tham Khảo</h2>` +
-      `<div class="timeline-container">${timeline}</div>` +
-    `</div>` +
-    `<div class="home-content">${renderedMd}</div>`
+        `<div class="gm-cta">` +
+          `<a class="gm-btn gm-btn-primary" href="${secHref('01-Intern')}">🚀 Bắt đầu Level 1</a>` +
+          `<a class="gm-btn gm-btn-ghost" href="${secHref('00-Overview')}">🧭 Xem tổng quan</a>` +
+        `</div>` +
+      `</section>` +
+      // CAMPAIGN
+      `<section class="gm-section">` +
+        `<div class="gm-section-head"><h2>🗺️ Bản đồ chiến dịch</h2><div class="gm-line"></div></div>` +
+        `<div class="gm-path">${levelCards}</div>` +
+      `</section>` +
+      // ZONES
+      `<section class="gm-section">` +
+        `<div class="gm-section-head"><h2>⚔️ Khu vực mở rộng</h2><div class="gm-line"></div></div>` +
+        `<div class="gm-zones">${zoneCards}</div>` +
+      `</section>` +
+      // TIPS
+      `<section class="gm-section">` +
+        `<div class="gm-section-head"><h2>💡 Triết lý học</h2><div class="gm-line"></div></div>` +
+        `<div class="gm-tips">${tipCards}</div>` +
+      `</section>` +
+      // FOOTER
+      `<div class="gm-foot">Tiến độ được lưu tự động trên trình duyệt của bạn · Mã nguồn trên <a href="https://github.com/mandexonla/Road-Map-Unity" target="_blank" rel="noopener">GitHub</a></div>` +
+    `</div>`
   );
 }
 
