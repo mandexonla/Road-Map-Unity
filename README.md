@@ -39,6 +39,7 @@ Lộ trình **không tuyến tính cứng nhắc**. Bạn đi theo 4 level chín
 | [`05-Technical-Deep-Dives/`](./05-Technical-Deep-Dives/README.md) | Kiến thức kỹ thuật chuyên sâu | Tham chiếu xuyên suốt |
 | [`06-Indie-Track/`](./06-Indie-Track/README.md) | Lộ trình làm game Indie toàn diện | Song song, từ Junior trở đi |
 | [`07-Interview-and-Portfolio/`](./07-Interview-and-Portfolio/README.md) | Phỏng vấn, portfolio, thị trường | Trước khi xin việc/ship game |
+| [`08-Knowledge-Base/`](./08-Knowledge-Base/README.md) | 📕 **Thư viện kiến thức chi tiết** — giải thích bản chất từng khái niệm (kiểu Unity Docs tiếng Việt) | Tra cứu khi cần hiểu sâu |
 
 ---
 

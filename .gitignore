@@ -16,6 +16,11 @@ Thumbs.db
 *.userosscache
 *.sln.docstates
 
-# Generated assets
+# Generated assets (rebuilt by CI via `npm run build` → build-content.js)
 app/public/Book/
+app/public/content/
+app/public/content-index.json
+
+# Local agent / temp
+.claude/
 
