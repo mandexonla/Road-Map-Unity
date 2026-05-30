@@ -2,6 +2,8 @@
 
 [⬅️ Mid Overview](./README.md) | [Projects ➡️](./projects.md)
 
+> 📕 **Hiểu BẢN CHẤT từng chủ đề Mid:** [⭐ SOLID](../08-Knowledge-Base/mid/solid-principles.md) · [⭐ Dependency Injection](../08-Knowledge-Base/mid/dependency-injection.md) · [UI Architecture (MVC/MVVM)](../08-Knowledge-Base/mid/ui-architecture-mvc-mvvm.md) · [Data-Driven Design](../08-Knowledge-Base/mid/data-driven-design.md) · [Async/UniTask](../08-Knowledge-Base/mid/async-await-unitask.md) · [⭐ Addressables](../08-Knowledge-Base/mid/addressables.md) · [Job System & Burst](../08-Knowledge-Base/mid/job-system-burst.md) · [Unit Testing](../08-Knowledge-Base/mid/unit-testing.md) · [Assembly Definitions](../08-Knowledge-Base/mid/assembly-definitions.md)
+
 ---
 
 ## A. Kiến Trúc Phần Mềm (trọng tâm của Mid)

@@ -4,6 +4,8 @@
 
 > Ở Senior, kỹ thuật là điều kiện cần, không phải đủ. **Phán đoán + Lãnh đạo** là cái phân biệt.
 
+> 📕 **Hiểu BẢN CHẤT (internals) từng chủ đề Senior:** [Serialization Internals](../08-Knowledge-Base/senior/serialization-internals.md) · [Memory Model](../08-Knowledge-Base/senior/memory-model.md) · [Rendering Pipeline Internals](../08-Knowledge-Base/senior/rendering-pipeline-internals.md) · [Execution Order & Player Loop](../08-Knowledge-Base/senior/execution-order-playerloop.md) · [C# Advanced & Performance](../08-Knowledge-Base/senior/csharp-advanced-performance.md) · [Technical Debt & Architecture](../08-Knowledge-Base/senior/technical-debt-and-architecture.md) · [ADR & Technical Docs](../08-Knowledge-Base/senior/adr-and-technical-docs.md)
+
 ---
 
 ## A. Technical Mastery — Hiểu Sâu Nguyên Lý

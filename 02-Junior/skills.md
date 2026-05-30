@@ -2,6 +2,8 @@
 
 [⬅️ Junior Overview](./README.md) | [Projects ➡️](./projects.md)
 
+> 📕 **Hiểu BẢN CHẤT từng chủ đề Junior:** [Interface/Abstract](../08-Knowledge-Base/junior/interface-and-abstract.md) · [Delegate-Event](../08-Knowledge-Base/junior/delegates-events.md) · [Generics](../08-Knowledge-Base/junior/generics.md) · [LINQ](../08-Knowledge-Base/junior/linq.md) · [C# Trung Cấp](../08-Knowledge-Base/junior/csharp-intermediate.md) · [Clean Code](../08-Knowledge-Base/junior/clean-code.md) · [⭐ ScriptableObject](../08-Knowledge-Base/junior/scriptableobject.md) · [Design Patterns](../08-Knowledge-Base/junior/design-patterns.md) ([Singleton](../08-Knowledge-Base/junior/singleton.md), [Observer](../08-Knowledge-Base/junior/observer-event-system.md), [State Machine](../08-Knowledge-Base/junior/state-machine.md), [Object Pool](../08-Knowledge-Base/junior/object-pooling.md), [Factory/Strategy](../08-Knowledge-Base/junior/factory-and-strategy.md), [Command](../08-Knowledge-Base/junior/command-pattern.md)) · [Animator](../08-Knowledge-Base/junior/animator.md) · [Input System](../08-Knowledge-Base/junior/new-input-system.md) · [UI uGUI](../08-Knowledge-Base/junior/ui-ugui.md) · [Save/Load](../08-Knowledge-Base/junior/save-load.md) · [Garbage Collection](../08-Knowledge-Base/junior/garbage-collection-basics.md)
+
 ---
 
 ## A. C# Trung Cấp (nâng cấp tư duy)
