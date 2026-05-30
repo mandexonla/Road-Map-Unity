@@ -469,5 +469,198 @@
         }
       ]
     }
-  ]
+  ],
+  "books": {
+    "Core": [],
+    "GameDesigner": [
+      {
+        "id": "2021_ABM-TheGameDesignerPlaybook_EBook",
+        "title": "2021 ABM TheGameDesignerPlaybook EBook",
+        "path": "Book/GameDesigner/2021_ABM-TheGameDesignerPlaybook_EBook.pdf",
+        "size": "3.0 MB"
+      },
+      {
+        "id": "Art of Game Design (Second Edition)",
+        "title": "Art Of Game Design (Second Edition)",
+        "path": "Book/GameDesigner/Art of Game Design (Second Edition).pdf",
+        "size": "14.8 MB"
+      },
+      {
+        "id": "Art-of-Game-Design-Second-Edition",
+        "title": "Art Of Game Design Second Edition",
+        "path": "Book/GameDesigner/Art-of-Game-Design-Second-Edition.pdf",
+        "size": "14.8 MB"
+      },
+      {
+        "id": "challenges-for-game-designers",
+        "title": "Challenges For Game Designers",
+        "path": "Book/GameDesigner/challenges-for-game-designers.pdf",
+        "size": "4.3 MB"
+      },
+      {
+        "id": "fundamentals-of-game-design",
+        "title": "Fundamentals Of Game Design",
+        "path": "Book/GameDesigner/fundamentals-of-game-design.pdf",
+        "size": "22.5 MB"
+      },
+      {
+        "id": "Game Balance (Ian Schreiber, Brenda Romero)",
+        "title": "Game Balance (Ian Schreiber, Brenda Romero)",
+        "path": "Book/GameDesigner/Game Balance (Ian Schreiber, Brenda Romero).pdf",
+        "size": "8.0 MB"
+      },
+      {
+        "id": "game-mechanics-advanced-game-design-",
+        "title": "Game Mechanics Advanced Game Design ",
+        "path": "Book/GameDesigner/game-mechanics-advanced-game-design-.pdf",
+        "size": "22.3 MB"
+      },
+      {
+        "id": "Susan_Weinschenk-100_Things_About_People-EN",
+        "title": "Susan Weinschenk 100 Things About People EN",
+        "path": "Book/GameDesigner/Susan_Weinschenk-100_Things_About_People-EN.pdf",
+        "size": "14.5 MB"
+      },
+      {
+        "id": "Susan_Weinschenk-100_Things_About_People-EN (1)",
+        "title": "Susan Weinschenk 100 Things About People EN (1)",
+        "path": "Book/GameDesigner/Susan_Weinschenk-100_Things_About_People-EN (1).pdf",
+        "size": "14.7 MB"
+      },
+      {
+        "id": "The Art of Game Design A Book",
+        "title": "The Art Of Game Design A Book",
+        "path": "Book/GameDesigner/The Art of Game Design A Book.pdf",
+        "size": "9.9 MB"
+      },
+      {
+        "id": "UNITY_Ebook_Introduction_to_level_design_in_game_development_and_in_Unity_V2",
+        "title": "UNITY Ebook Introduction To Level Design In Game Development And In Unity V2",
+        "path": "Book/GameDesigner/UNITY_Ebook_Introduction_to_level_design_in_game_development_and_in_Unity_V2.pdf",
+        "size": "26.2 MB"
+      },
+      {
+        "id": "User_interface_design_and_implementation_in_Unity",
+        "title": "User Interface Design And Implementation In Unity",
+        "path": "Book/GameDesigner/User_interface_design_and_implementation_in_Unity.pdf",
+        "size": "23.3 MB"
+      },
+      {
+        "id": "virtual-economies-design-and-analysis-information-",
+        "title": "Virtual Economies Design And Analysis Information ",
+        "path": "Book/GameDesigner/virtual-economies-design-and-analysis-information-.pdf",
+        "size": "2.9 MB"
+      }
+    ],
+    "Levelup": [
+      {
+        "id": "2022_WritingCleanerCodeThatScales_EBook-v6-Final",
+        "title": "2022 WritingCleanerCodeThatScales EBook V6 Final",
+        "path": "Book/Levelup/2022_WritingCleanerCodeThatScales_EBook-v6-Final.pdf",
+        "size": "4.1 MB"
+      },
+      {
+        "id": "create-modular-game-architecture-in-unity-with-scriptableobjects",
+        "title": "Create Modular Game Architecture In Unity With Scriptableobjects",
+        "path": "Book/Levelup/create-modular-game-architecture-in-unity-with-scriptableobjects.pdf",
+        "size": "6.1 MB"
+      },
+      {
+        "id": "Data-Oriented_Technology_Stack_for_advanced_Unity_users_2022_LTS_final",
+        "title": "Data Oriented Technology Stack For Advanced Unity Users 2022 LTS Final",
+        "path": "Book/Levelup/Data-Oriented_Technology_Stack_for_advanced_Unity_users_2022_LTS_final.pdf",
+        "size": "1.6 MB"
+      },
+      {
+        "id": "Level_up_your_code_with_Game_Programming_Pattern",
+        "title": "Level Up Your Code With Game Programming Pattern",
+        "path": "Book/Levelup/Level_up_your_code_with_Game_Programming_Pattern.pdf",
+        "size": "11.8 MB"
+      }
+    ],
+    "Multiplay": [
+      {
+        "id": "Introduction_to_multiplayer_networking_in_Unity",
+        "title": "Introduction To Multiplayer Networking In Unity",
+        "path": "Book/Multiplay/Introduction_to_multiplayer_networking_in_Unity.pdf",
+        "size": "5.1 MB"
+      }
+    ],
+    "Optimize": [
+      {
+        "id": "80_tips_to_increase_your_productivity_in_Unity_2022_LTS",
+        "title": "80 Tips To Increase Your Productivity In Unity 2022 LTS",
+        "path": "Book/Optimize/80_tips_to_increase_your_productivity_in_Unity_2022_LTS.pdf",
+        "size": "11.4 MB"
+      },
+      {
+        "id": "Improving_Workflow_Productivity_R7",
+        "title": "Improving Workflow Productivity R7",
+        "path": "Book/Optimize/Improving_Workflow_Productivity_R7.pdf",
+        "size": "12.6 MB"
+      },
+      {
+        "id": "JW-10207_Unity_eBook_OptimizeYourMobileGamePerformance_V6_May2021",
+        "title": "JW 10207 Unity EBook OptimizeYourMobileGamePerformance V6 May2021",
+        "path": "Book/Optimize/JW-10207_Unity_eBook_OptimizeYourMobileGamePerformance_V6_May2021.pdf",
+        "size": "8.8 MB"
+      },
+      {
+        "id": "Optimize_your_console_and_PC_game_performance_Unity_2022_LTS",
+        "title": "Optimize Your Console And PC Game Performance Unity 2022 LTS",
+        "path": "Book/Optimize/Optimize_your_console_and_PC_game_performance_Unity_2022_LTS.pdf",
+        "size": "33.4 MB"
+      },
+      {
+        "id": "Optimize_your_game_performance_for_consoles_and_PCs_in_Unity_Unity_6_edition",
+        "title": "Optimize Your Game Performance For Consoles And PCs In Unity Unity 6 Edition",
+        "path": "Book/Optimize/Optimize_your_game_performance_for_consoles_and_PCs_in_Unity_Unity_6_edition.pdf",
+        "size": "7.5 MB"
+      },
+      {
+        "id": "Optimize_your_game_performance_for_mobile__XR__and_the_web_in_Unity_Unity_6_edition",
+        "title": "Optimize Your Game Performance For Mobile  XR  And The Web In Unity Unity 6 Edition",
+        "path": "Book/Optimize/Optimize_your_game_performance_for_mobile__XR__and_the_web_in_Unity_Unity_6_edition.pdf",
+        "size": "6.4 MB"
+      },
+      {
+        "id": "OptimizeGamePerformance_eBook_Final",
+        "title": "OptimizeGamePerformance EBook Final",
+        "path": "Book/Optimize/OptimizeGamePerformance_eBook_Final.pdf",
+        "size": "19.5 MB"
+      },
+      {
+        "id": "Ultimate_Guide_to_Profiling_Unity_Games",
+        "title": "Ultimate Guide To Profiling Unity Games",
+        "path": "Book/Optimize/Ultimate_Guide_to_Profiling_Unity_Games.pdf",
+        "size": "11.6 MB"
+      },
+      {
+        "id": "unity-game-dev-field-guide",
+        "title": "Unity Game Dev Field Guide",
+        "path": "Book/Optimize/unity-game-dev-field-guide.pdf",
+        "size": "6.1 MB"
+      },
+      {
+        "id": "Unity_OptimizeYourMobileGamePerformance_Final",
+        "title": "Unity OptimizeYourMobileGamePerformance Final",
+        "path": "Book/Optimize/Unity_OptimizeYourMobileGamePerformance_Final.pdf",
+        "size": "14.2 MB"
+      }
+    ],
+    "Trader": [
+      {
+        "id": "Alexander Elder - The New Trading For a Living (2014)",
+        "title": "Alexander Elder   The New Trading For A Living (2014)",
+        "path": "Book/Trader/Alexander Elder - The New Trading For a Living (2014).pdf",
+        "size": "13.0 MB"
+      },
+      {
+        "id": "Smart-Money-Concept-trading-strategy-PDF",
+        "title": "Smart Money Concept Trading Strategy PDF",
+        "path": "Book/Trader/Smart-Money-Concept-trading-strategy-PDF.pdf",
+        "size": "1.2 MB"
+      }
+    ]
+  }
 }

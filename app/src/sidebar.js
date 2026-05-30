@@ -54,6 +54,47 @@ export function initSidebar(contentIndex, onNavigate) {
     html += `</div>`; // .nav-section
   }
 
+  // ── Append Book Library Section ──────────────────────────────────
+  if (contentIndex.books) {
+    const totalBooks = Object.values(contentIndex.books).reduce((acc, cat) => acc + cat.length, 0);
+    html += `<div class="nav-section">`;
+    html += `<button class="nav-section-header" data-section-id="books">`;
+    html += `<span class="nav-section-icon">📚</span>`;
+    html += `<span class="nav-section-title">Tủ Sách Lập Trình</span>`;
+    html += `<span class="nav-section-badge">${totalBooks}</span>`;
+    html += `<span class="nav-section-arrow">›</span>`;
+    html += `</button>`;
+    html += `<div class="nav-section-items">`;
+    
+    html += `<a class="nav-item" href="#/book/library" data-path="book/library.md">`;
+    html += `<span class="nav-item-icon">🏛️</span>`;
+    html += `<span class="nav-item-title">Xem Tất Cả Sách</span>`;
+    html += `</a>`;
+    
+    const catTitles = {
+      'Core': 'Nền tảng C# / .NET',
+      'GameDesigner': 'Thiết Kế Game',
+      'Levelup': 'Nâng Cao Kỹ Năng',
+      'Multiplay': 'Game Nhiều Người Chơi',
+      'Optimize': 'Tối Ưu Hóa Game',
+      'Trader': 'Kinh Doanh & Phát Hành'
+    };
+    
+    for (const catName of Object.keys(contentIndex.books)) {
+      const catBooks = contentIndex.books[catName];
+      if (catBooks.length === 0) continue;
+      const displayTitle = catTitles[catName] || catName;
+      
+      html += `<a class="nav-item" href="#/book/category/${catName}" data-path="book/category/${catName}.md" style="padding-left: 24px;">`;
+      html += `<span class="nav-item-icon">📁</span>`;
+      html += `<span class="nav-item-title">${displayTitle}</span>`;
+      html += `</a>`;
+    }
+    
+    html += `</div>`; // .nav-section-items
+    html += `</div>`; // .nav-section
+  }
+
   sidebarNav.innerHTML = html;
 
   // ── Section header toggle ────────────────────────────────────

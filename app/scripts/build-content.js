@@ -14,6 +14,8 @@ const path = require('path');
 const ROOT_DIR = path.resolve(__dirname, '..', '..');       // d:\Code\Road-Map-Unity
 const OUTPUT_DIR = path.resolve(__dirname, '..', 'public', 'content');
 const INDEX_FILE = path.resolve(__dirname, '..', 'public', 'content-index.json');
+const BOOK_SRC_DIR = path.resolve(ROOT_DIR, 'Book');
+const BOOK_OUTPUT_DIR = path.resolve(__dirname, '..', 'public', 'Book');
 
 const EXCLUDED_DIRS = new Set(['.git', 'node_modules', 'app', '.github', '.vscode', 'dist']);
 
@@ -233,15 +235,64 @@ function build() {
   // Sort sections by order
   sections.sort((a, b) => a.order - b.order);
 
+  // ── Scan Book Directory ────────────────────────────────────────────────
+  const books = {};
+  let totalBooks = 0;
+  if (fs.existsSync(BOOK_SRC_DIR)) {
+    console.log('📚 Scanning books directory...');
+    cleanDir(BOOK_OUTPUT_DIR);
+    const categories = fs.readdirSync(BOOK_SRC_DIR, { withFileTypes: true });
+    
+    for (const cat of categories) {
+      if (!cat.isDirectory()) continue;
+      
+      const catName = cat.name;
+      const catDir = path.join(BOOK_SRC_DIR, catName);
+      books[catName] = [];
+      
+      const files = fs.readdirSync(catDir, { withFileTypes: true });
+      for (const file of files) {
+        if (file.isFile() && file.name.toLowerCase().endsWith('.pdf')) {
+          const relativeDestPath = path.join(catName, file.name);
+          const absoluteDest = path.join(BOOK_OUTPUT_DIR, relativeDestPath);
+          copyFile(path.join(catDir, file.name), absoluteDest);
+          
+          // Humanize title
+          const title = file.name
+            .replace(/\.pdf$/i, '')
+            .replace(/[-_]/g, ' ')
+            .replace(/\b\w/g, c => c.toUpperCase());
+            
+          const stats = fs.statSync(path.join(catDir, file.name));
+          const sizeMB = (stats.size / (1024 * 1024)).toFixed(1) + ' MB';
+          
+          books[catName].push({
+            id: file.name.replace(/\.pdf$/i, ''),
+            title: title,
+            path: `Book/${catName}/${file.name}`.replace(/\\/g, '/'),
+            size: sizeMB
+          });
+          totalBooks++;
+        }
+      }
+      
+      // Sort books within category alphabetically
+      books[catName].sort((a, b) => a.title.localeCompare(b.title));
+    }
+  } else {
+    console.warn(`   ⚠ Book directory not found at: ${BOOK_SRC_DIR}`);
+  }
+
   // ── Write content-index.json ───────────────────────────────────────────
-  const index = { sections };
+  const index = { sections, books };
   const indexDir = path.dirname(INDEX_FILE);
   if (!fs.existsSync(indexDir)) {
     fs.mkdirSync(indexDir, { recursive: true });
   }
   fs.writeFileSync(INDEX_FILE, JSON.stringify(index, null, 2), 'utf-8');
 
-  console.log(`   ✅ Built index with ${sections.length} sections, ${totalFiles} files.`);
+  console.log(`   ✅ Built index with ${sections.length} sections, ${totalFiles} markdown files.`);
+  console.log(`   📚 Scanned ${totalBooks} books across ${Object.keys(books).length} categories.`);
   console.log(`   📄 ${INDEX_FILE}`);
 }
 

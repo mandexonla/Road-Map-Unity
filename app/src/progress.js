@@ -121,3 +121,41 @@ function save() {
     console.warn('Failed to save progress data:', e);
   }
 }
+
+// ── Book progress ────────────────────────────────────────────────
+
+export function getBookProgress(bookId) {
+  try {
+    const data = localStorage.getItem('unity-roadmap-books-progress');
+    if (!data) return null;
+    const progress = JSON.parse(data);
+    return progress[bookId] || null;
+  } catch (e) {
+    console.warn('Failed to load book progress:', e);
+    return null;
+  }
+}
+
+export function setBookProgress(bookId, page) {
+  try {
+    const data = localStorage.getItem('unity-roadmap-books-progress') || '{}';
+    const progress = JSON.parse(data);
+    progress[bookId] = { page, timestamp: Date.now() };
+    localStorage.setItem('unity-roadmap-books-progress', JSON.stringify(progress));
+  } catch (e) {
+    console.warn('Failed to save book progress:', e);
+  }
+}
+
+export function clearBookProgress(bookId) {
+  try {
+    const data = localStorage.getItem('unity-roadmap-books-progress');
+    if (!data) return;
+    const progress = JSON.parse(data);
+    delete progress[bookId];
+    localStorage.setItem('unity-roadmap-books-progress', JSON.stringify(progress));
+  } catch (e) {
+    console.warn('Failed to clear book progress:', e);
+  }
+}
+
