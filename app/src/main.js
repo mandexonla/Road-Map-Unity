@@ -101,6 +101,7 @@ async function handleNavigation(path) {
     if (path === 'README.md') {
       contentEl.innerHTML = renderHomePage(mdContent, contentIndex);
       setTimeout(() => {
+        initHomeProfile();
         initSkillTree(contentIndex);
       }, 0);
     } else {
@@ -152,68 +153,179 @@ function postRender(path) {
 // ── Home Page ────────────────────────────────────────────────────
 
 function renderHomePage(mdContent, index) {
-  const renderedMd = renderMarkdown(mdContent, 'README.md');
+  const profile = getPlayerProfile();
+  const progress = getTotalProgress(index);
+  const boardLevels = getBoardLevels(index);
+  const supportSections = getSupportSections(index);
+  const currentLevel = getCurrentLevel(progress.percentage);
 
-  // Build section cards
-  let sectionCards = '';
-  if (index.sections) {
-    sectionCards = index.sections.map(section => {
-      const fileCount = countSectionFiles(section);
-      const href = section.files && section.files.length > 0
-        ? '#/' + section.files[0].path.replace(/\.md$/, '')
-        : '#/';
-      return (
-        `<a class="section-card" href="${href}">` +
-          `<div class="section-card-icon">${section.icon || '📁'}</div>` +
-          `<div class="section-card-title">${section.title}</div>` +
-          `<div class="section-card-count">${fileCount} bài viết</div>` +
-        `</a>`
-      );
-    }).join('');
-  }
+  const levelCards = boardLevels.map((level, idx) => {
+    const stepNumber = String(idx + 1).padStart(2, '0');
+    const filesText = `${countSectionFiles(level.section)} nhiệm vụ`;
+    return (
+      `<a class="board-level level-${idx + 1}" href="${level.href}">` +
+        `<span class="level-step">${stepNumber}</span>` +
+        `<span class="level-icon">${level.icon}</span>` +
+        `<span class="level-name">${escapeHtml(level.title)}</span>` +
+        `<span class="level-desc">${escapeHtml(level.desc)}</span>` +
+        `<span class="level-meta">${filesText}</span>` +
+      `</a>`
+    );
+  }).join('');
 
-  // Build timeline (career progression)
-  const timelineLevels = [
-    { icon: '🌱', title: 'Intern', duration: '0-3 tháng', desc: 'Học cơ bản Unity, C# và workflow' },
-    { icon: '🌿', title: 'Fresher', duration: '3-6 tháng', desc: 'Nắm vững core systems và patterns' },
-    { icon: '🌳', title: 'Junior', duration: '6-12 tháng', desc: 'Xây dựng dự án hoàn chỉnh' },
-    { icon: '🌲', title: 'Mid-Level', duration: '1-2 năm', desc: 'Architecture và optimization' },
-    { icon: '🏔️', title: 'Senior', duration: '2+ năm', desc: 'Hệ thống phức tạp và mentoring' },
-  ];
-
-  const timeline = timelineLevels.map(level => (
-    `<div class="timeline-item">` +
-      `<div class="timeline-icon">${level.icon}</div>` +
-      `<div class="timeline-content">` +
-        `<div class="timeline-title">${level.title}</div>` +
-        `<div class="timeline-duration">${level.duration}</div>` +
-        `<div class="timeline-desc">${level.desc}</div>` +
-      `</div>` +
-    `</div>`
-  )).join('');
+  const supportCards = supportSections.map(section => {
+    const href = section.files && section.files.length > 0
+      ? '#/' + section.files[0].path.replace(/\.md$/, '')
+      : '#/';
+    return (
+      `<a class="support-card" href="${href}">` +
+        `<span class="support-icon">${section.icon || '📁'}</span>` +
+        `<span class="support-title">${escapeHtml(section.title)}</span>` +
+        `<span class="support-meta">${countSectionFiles(section)} bài</span>` +
+      `</a>`
+    );
+  }).join('');
 
   return (
-    `<div class="home-hero">` +
-      `<h1 class="home-title">🎮 Lộ Trình Unity Developer</h1>` +
-      `<p class="home-subtitle">Từ Intern đến Senior — Tài liệu toàn diện bằng Tiếng Việt</p>` +
-      `<div class="home-roadmap-container">` +
-        `<div class="home-progress-summary" style="margin-bottom: 24px;">` +
-          `<span class="home-progress-label">Tiến độ tổng thể</span>` +
-          `<span class="home-progress-value" id="home-progress-value">${getProgressText()}</span>` +
+    `<section class="game-home-shell">` +
+      `<div class="game-hero">` +
+        `<div class="hero-copy">` +
+          `<span class="hero-kicker">Unity Developer Roadmap</span>` +
+          `<h1 class="game-title">Bản đồ thăng cấp Unity Developer</h1>` +
+          `<p class="game-subtitle">Chọn nhân vật, đặt tên, đi từng level và mở khóa kiến thức theo lộ trình rõ ràng từ nền tảng đến portfolio.</p>` +
+          `<div class="hero-actions">` +
+            `<a href="#/01-Intern/README" class="primary-quest-btn">Bắt đầu Level 1</a>` +
+            `<a href="#/00-Overview/self-assessment" class="secondary-quest-btn">Tự đánh giá</a>` +
+          `</div>` +
         `</div>` +
-        `<div id="interactive-skill-tree" class="skill-tree-box"></div>` +
+        `<form class="player-card" id="player-profile-form">` +
+          `<div class="player-card-top">` +
+            `<span class="player-rank">Người chơi</span>` +
+            `<span class="player-progress" id="home-progress-value">${getProgressText()}</span>` +
+          `</div>` +
+          `<div class="avatar-picker" role="radiogroup" aria-label="Chọn nhân vật">` +
+            `${renderAvatarOptions(profile.avatar)}` +
+          `</div>` +
+          `<label class="player-name-field">` +
+            `<span>Tên nhân vật</span>` +
+            `<input id="player-name-input" name="playerName" maxlength="28" value="${escapeHtml(profile.name)}" placeholder="Nhập tên của bạn">` +
+          `</label>` +
+          `<button class="save-player-btn" type="submit">Lưu nhân vật</button>` +
+          `<p class="player-save-note" id="player-save-note">Đang ở ${currentLevel}</p>` +
+        `</form>` +
       `</div>` +
-    `</div>` +
-    `<div class="home-sections">` +
-      `<h2 class="home-sections-title">📚 Các Phần Chính</h2>` +
-      `<div class="home-sections-grid">${sectionCards}</div>` +
-    `</div>` +
-    `<div class="home-timeline">` +
-      `<h2>⏱️ Timeline Tham Khảo</h2>` +
-      `<div class="timeline-container">${timeline}</div>` +
-    `</div>` +
-    `<div class="home-content">${renderedMd}</div>`
+      `<div class="board-stage">` +
+        `<div class="board-grid"></div>` +
+        `<div class="board-path" aria-label="Lộ trình level">${levelCards}</div>` +
+      `</div>` +
+      `<section class="quest-panel">` +
+        `<div>` +
+          `<span class="panel-kicker">Nhiệm vụ phụ</span>` +
+          `<h2>Kho kiến thức, indie track và phỏng vấn</h2>` +
+        `</div>` +
+        `<div class="support-grid">${supportCards}</div>` +
+      `</section>` +
+      `<section class="visual-rules">` +
+        `<div class="rule-card"><strong>Đi theo level</strong><span>Mỗi level gom README, skills, projects, checklist và resources thành một chặng học có mục tiêu.</span></div>` +
+        `<div class="rule-card"><strong>Đánh dấu hoàn thành</strong><span>Checklist trong bài học vẫn lưu tiến độ riêng bằng localStorage.</span></div>` +
+        `<div class="rule-card"><strong>Sơ đồ trực quan</strong><span>Các diagram trong markdown được render thành khối tương tác thay vì giữ dạng text khô.</span></div>` +
+      `</section>` +
+    `</section>`
   );
+}
+
+function initHomeProfile() {
+  const form = document.getElementById('player-profile-form');
+  if (!form) return;
+
+  const note = document.getElementById('player-save-note');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nameInput = document.getElementById('player-name-input');
+    const avatarInput = form.querySelector('input[name="avatar"]:checked');
+    const profile = {
+      name: (nameInput?.value || 'Unity Learner').trim() || 'Unity Learner',
+      avatar: avatarInput?.value || 'knight',
+    };
+
+    localStorage.setItem('unity-roadmap-player', JSON.stringify(profile));
+    if (note) {
+      note.textContent = `Đã lưu ${profile.name}`;
+      note.classList.add('saved');
+      setTimeout(() => note.classList.remove('saved'), 1200);
+    }
+  });
+}
+
+function getPlayerProfile() {
+  try {
+    const saved = localStorage.getItem('unity-roadmap-player');
+    if (saved) {
+      return { name: 'Unity Learner', avatar: 'knight', ...JSON.parse(saved) };
+    }
+  } catch (e) {
+    console.warn('Failed to load player profile:', e);
+  }
+  return { name: 'Unity Learner', avatar: 'knight' };
+}
+
+function renderAvatarOptions(selectedAvatar) {
+  const avatars = [
+    { id: 'knight', label: 'Hiệp sĩ', icon: '🛡️' },
+    { id: 'mage', label: 'Pháp sư', icon: '✨' },
+    { id: 'ranger', label: 'Xạ thủ', icon: '🏹' },
+    { id: 'builder', label: 'Builder', icon: '🧰' },
+  ];
+
+  return avatars.map(avatar => {
+    const checked = avatar.id === selectedAvatar ? ' checked' : '';
+    return (
+      `<label class="avatar-option" title="${avatar.label}">` +
+        `<input type="radio" name="avatar" value="${avatar.id}"${checked}>` +
+        `<span>${avatar.icon}</span>` +
+      `</label>`
+    );
+  }).join('');
+}
+
+function getBoardLevels(index) {
+  const levelMeta = {
+    '01-Intern': 'Làm quen Unity Editor, C# cơ bản, GameObject và MonoBehaviour.',
+    '02-Junior': 'Xây hệ thống gameplay nhỏ, UI, physics và vòng lặp hoàn chỉnh.',
+    '03-Mid-Level': 'Thiết kế module, tối ưu hiệu năng và quản lý dự án lớn hơn.',
+    '04-Senior': 'Kiến trúc hệ thống, mentoring, profiling sâu và quyết định kỹ thuật.',
+  };
+
+  return (index.sections || [])
+    .filter(section => levelMeta[section.id])
+    .map(section => ({
+      section,
+      title: section.title.replace(/^Level\s+\d+:\s*/i, ''),
+      icon: section.icon || '🎮',
+      desc: levelMeta[section.id],
+      href: section.files && section.files.length > 0
+        ? '#/' + section.files[0].path.replace(/\.md$/, '')
+        : '#/',
+    }));
+}
+
+function getSupportSections(index) {
+  const supportIds = new Set([
+    '00-Overview',
+    '05-Technical-Deep-Dives',
+    '06-Indie-Track',
+    '07-Interview-and-Portfolio',
+    '08-Knowledge-Base',
+  ]);
+
+  return (index.sections || []).filter(section => supportIds.has(section.id));
+}
+
+function getCurrentLevel(percentage) {
+  if (percentage >= 75) return 'Level 4: Senior';
+  if (percentage >= 50) return 'Level 3: Mid-Level';
+  if (percentage >= 25) return 'Level 2: Junior';
+  return 'Level 1: Intern';
 }
 
 // ── Breadcrumb ───────────────────────────────────────────────────
