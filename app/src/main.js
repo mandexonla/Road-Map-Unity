@@ -494,8 +494,7 @@ async function handleBookNavigation(path) {
       'GameDesigner': 'Thiết Kế Game',
       'Levelup': 'Nâng Cao Kỹ Năng',
       'Multiplay': 'Game Nhiều Người Chơi',
-      'Optimize': 'Tối Ưu Hóa Game',
-      'Trader': 'Kinh Doanh & Phát Hành'
+      'Optimize': 'Tối Ưu Hóa Game'
     };
     const title = catTitles[catName] || catName;
     postRenderBook(path, title);
@@ -554,8 +553,7 @@ function updateBookBreadcrumb(path, pageTitle) {
       'GameDesigner': 'Thiết Kế Game',
       'Levelup': 'Nâng Cao Kỹ Năng',
       'Multiplay': 'Game Nhiều Người Chơi',
-      'Optimize': 'Tối Ưu Hóa Game',
-      'Trader': 'Kinh Doanh & Phát Hành'
+      'Optimize': 'Tối Ưu Hóa Game'
     };
     const catTitle = catTitles[catName] || catName;
     html += `<a href="#/book/library" class="breadcrumb-link">📚 Tủ Sách</a>`;
@@ -574,8 +572,7 @@ function renderLibraryDashboard() {
     'GameDesigner': 'Thiết Kế Game',
     'Levelup': 'Nâng Cao Kỹ Năng',
     'Multiplay': 'Game Nhiều Người Chơi',
-    'Optimize': 'Tối Ưu Hóa Game',
-    'Trader': 'Kinh Doanh & Phát Hành'
+    'Optimize': 'Tối Ưu Hóa Game'
   };
 
   const catIcons = {
@@ -583,8 +580,7 @@ function renderLibraryDashboard() {
     'GameDesigner': '🎨',
     'Levelup': '🚀',
     'Multiplay': '🌐',
-    'Optimize': '⚡',
-    'Trader': '📈'
+    'Optimize': '⚡'
   };
 
   const catDescs = {
@@ -592,8 +588,7 @@ function renderLibraryDashboard() {
     'GameDesigner': 'Lý thuyết game design, tâm lý học người chơi, thiết kế màn chơi và UX.',
     'Levelup': 'Cấu trúc dữ liệu & giải thuật, design patterns, và kiến trúc hệ thống game nâng cao.',
     'Multiplay': 'Lập trình mạng multiplayer, đồng bộ trạng thái, socket và thiết kế server-client.',
-    'Optimize': 'Profiling, quản lý RAM/VRAM, tối ưu hóa CPU/GPU render pipeline trong Unity.',
-    'Trader': 'Xuất bản và phát hành game, ASO, phân tích thị trường, mô hình kiếm tiền ad/IAP.'
+    'Optimize': 'Profiling, quản lý RAM/VRAM, tối ưu hóa CPU/GPU render pipeline trong Unity.'
   };
 
   let cardsHtml = '';
@@ -649,8 +644,7 @@ function renderLibraryCategory(catName) {
     'GameDesigner': 'Thiết Kế Game',
     'Levelup': 'Nâng Cao Kỹ Năng',
     'Multiplay': 'Game Nhiều Người Chơi',
-    'Optimize': 'Tối Ưu Hóa Game',
-    'Trader': 'Kinh Doanh & Phát Hành'
+    'Optimize': 'Tối Ưu Hóa Game'
   };
 
   const displayTitle = catTitles[catName] || catName;

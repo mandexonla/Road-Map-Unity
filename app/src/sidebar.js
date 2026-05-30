@@ -76,8 +76,7 @@ export function initSidebar(contentIndex, onNavigate) {
       'GameDesigner': 'Thiết Kế Game',
       'Levelup': 'Nâng Cao Kỹ Năng',
       'Multiplay': 'Game Nhiều Người Chơi',
-      'Optimize': 'Tối Ưu Hóa Game',
-      'Trader': 'Kinh Doanh & Phát Hành'
+      'Optimize': 'Tối Ưu Hóa Game'
     };
     
     for (const catName of Object.keys(contentIndex.books)) {

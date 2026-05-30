@@ -647,20 +647,6 @@
         "path": "Book/Optimize/Unity_OptimizeYourMobileGamePerformance_Final.pdf",
         "size": "14.2 MB"
       }
-    ],
-    "Trader": [
-      {
-        "id": "Alexander Elder - The New Trading For a Living (2014)",
-        "title": "Alexander Elder   The New Trading For A Living (2014)",
-        "path": "Book/Trader/Alexander Elder - The New Trading For a Living (2014).pdf",
-        "size": "13.0 MB"
-      },
-      {
-        "id": "Smart-Money-Concept-trading-strategy-PDF",
-        "title": "Smart Money Concept Trading Strategy PDF",
-        "path": "Book/Trader/Smart-Money-Concept-trading-strategy-PDF.pdf",
-        "size": "1.2 MB"
-      }
     ]
   }
 }
