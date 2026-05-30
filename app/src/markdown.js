@@ -180,26 +180,34 @@ export function initMarkdown() {
   renderer.heading = function ({ text, depth }) {
     const headingText = typeof text === 'string' ? text : '';
     const slug = slugify(headingText);
+    
+    // Extract leading emoji
+    const emojiMatch = headingText.match(/^([\u2700-\u27BF]|[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDC00-\uDFFF])\s*(.*)$/);
+    let emojiSpan = '';
+    let displayText = headingText;
+    
+    if (emojiMatch) {
+      emojiSpan = `<span class="heading-emoji">${emojiMatch[1]}</span>`;
+      displayText = emojiMatch[2];
+    }
 
     if (depth === 1) {
       let badge = '';
-      let displayText = headingText;
-
-      if (headingText.includes('🟢')) {
+      if (displayText.includes('🟢')) {
         badge = '<span class="difficulty-badge beginner">Beginner</span>';
-        displayText = headingText.replace('🟢', '').trim();
-      } else if (headingText.includes('🟡')) {
+        displayText = displayText.replace('🟢', '').trim();
+      } else if (displayText.includes('🟡')) {
         badge = '<span class="difficulty-badge intermediate">Intermediate</span>';
-        displayText = headingText.replace('🟡', '').trim();
-      } else if (headingText.includes('🔴')) {
+        displayText = displayText.replace('🟡', '').trim();
+      } else if (displayText.includes('🔴')) {
         badge = '<span class="difficulty-badge advanced">Advanced</span>';
-        displayText = headingText.replace('🔴', '').trim();
+        displayText = displayText.replace('🔴', '').trim();
       }
 
-      return `<h1 id="${slug}">${displayText}${badge}</h1>`;
+      return `<h1 id="${slug}">${emojiSpan}${displayText}${badge}</h1>`;
     }
 
-    return `<h${depth} id="${slug}">${headingText}</h${depth}>`;
+    return `<h${depth} id="${slug}">${emojiSpan}${displayText}</h${depth}>`;
   };
 
   // ── Tables → responsive wrapper ──────────────────────────────
@@ -253,7 +261,82 @@ export function initMarkdown() {
 export function renderMarkdown(mdContent, filePath) {
   checkboxIndex = 0;
   currentFilePath = filePath || '';
-  return marked.parse(mdContent);
+  
+  // Clean up and extract navigation links
+  let cleanMd = mdContent;
+  let prevLink = null;
+  let nextLink = null;
+  
+  // Let's scan all lines to separate navigation lines from body
+  const lines = mdContent.split('\n');
+  const bodyLines = [];
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    // Detect navigation line
+    if (line.startsWith('[⬅️') || line.startsWith('[⏮️') || line.endsWith('➡️]') || 
+        line.endsWith('➡️') || (line.includes('⬅️') && line.includes('➡️') && line.includes('|')) ||
+        (line.startsWith('[⬅️') && line.includes('|'))) {
+      
+      // Find all markdown links in this line
+      const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
+      let match;
+      while ((match = linkRegex.exec(line)) !== null) {
+        const label = match[1].trim();
+        const path = match[2].trim();
+        if (label.includes('⬅️') || label.includes('Bài trước') || label.includes('Hướng nghề nghiệp') || label.includes('Cách dùng')) {
+          prevLink = { label: label.replace('⬅️', '').trim(), path };
+        } else if (label.includes('➡️') || label.includes('Bài tiếp theo') || label.includes('Cách tự đánh giá') || label.includes('Lộ trình')) {
+          nextLink = { label: label.replace('➡️', '').trim(), path };
+        }
+      }
+      continue; // Skip this line so it doesn't render as raw text
+    }
+    
+    // Also skip standard dividers right under top navigation
+    if (bodyLines.length === 0 && line === '---') {
+      continue;
+    }
+    
+    bodyLines.push(lines[i]);
+  }
+  
+  cleanMd = bodyLines.join('\n');
+  
+  let html = marked.parse(cleanMd);
+  
+  // Append beautiful navigation cards if we found any prev/next links
+  if (prevLink || nextLink) {
+    let navHtml = '<div class="content-nav">';
+    if (prevLink) {
+      const resolved = resolveRelativePath(filePath, prevLink.path);
+      const hash = '#/' + resolved.replace(/\.md$/, '');
+      navHtml += `
+        <a class="content-nav-link prev" href="${hash}">
+          <small>⬅️ BÀI TRƯỚC</small>
+          <span>${escapeHtml(prevLink.label)}</span>
+        </a>
+      `;
+    } else {
+      // Empty placeholder for spacing
+      navHtml += '<div class="content-nav-spacer"></div>';
+    }
+    
+    if (nextLink) {
+      const resolved = resolveRelativePath(filePath, nextLink.path);
+      const hash = '#/' + resolved.replace(/\.md$/, '');
+      navHtml += `
+        <a class="content-nav-link next" href="${hash}">
+          <small>BÀI TIẾP THEO ➡️</small>
+          <span>${escapeHtml(nextLink.label)}</span>
+        </a>
+      `;
+    }
+    navHtml += '</div>';
+    html += navHtml;
+  }
+  
+  return html;
 }
 
 /**
@@ -356,6 +439,9 @@ function escapeHtml(str) {
 // ── Interactive Diagrams Renderers ─────────────────────────────────
 
 function tryRenderInteractiveDiagram(code) {
+  if (code.includes('INTERN -> JUNIOR -> MID -> SENIOR') || (code.includes('TECHNICAL') && code.includes('CÔNG TY'))) {
+    return renderOverviewDiagram();
+  }
   if (code.includes('UNITY DEVELOPER') && code.includes('Gameplay')) {
     return renderCareerPathsDiagram();
   }
@@ -375,6 +461,69 @@ function tryRenderInteractiveDiagram(code) {
     return renderLifecycleDiagram();
   }
   return null;
+}
+
+function renderOverviewDiagram() {
+  return `
+    <div class="interactive-diagram overview-diagram">
+      <div class="overview-header">
+        <span class="diagram-badge">Lộ Trình Tổng Quan</span>
+        <h3>🎮 BẢN ĐỒ TIẾN TRÌNH UNITY DEVELOPER</h3>
+      </div>
+      
+      <!-- Phase Timeline -->
+      <div class="overview-phases">
+        <a class="phase-card intern" href="#/01-Intern/README">
+          <div class="phase-badge">Level 1</div>
+          <div class="phase-title">🌱 Intern</div>
+          <div class="phase-time">0 - 6 tháng</div>
+          <div class="phase-desc">Học cơ bản C#, Editor, và làm game jam nhỏ.</div>
+        </a>
+        <div class="phase-connector">➔</div>
+        <a class="phase-card junior" href="#/02-Junior/README">
+          <div class="phase-badge">Level 2</div>
+          <div class="phase-title">🌿 Junior</div>
+          <div class="phase-time">6 - 18 tháng</div>
+          <div class="phase-desc">Nắm vững core systems, UI, 2D/3D physics, và Git.</div>
+        </a>
+        <div class="phase-connector">➔</div>
+        <a class="phase-card mid" href="#/03-Mid-Level/README">
+          <div class="phase-badge">Level 3</div>
+          <div class="phase-title">🌳 Mid-Level</div>
+          <div class="phase-time">1.5 - 3 năm</div>
+          <div class="phase-desc">Thiết kế hệ thống độc lập, tối ưu hiệu năng và bộ nhớ.</div>
+        </a>
+        <div class="phase-connector">➔</div>
+        <a class="phase-card senior" href="#/04-Senior/README">
+          <div class="phase-badge">Level 4</div>
+          <div class="phase-title">🏔️ Senior</div>
+          <div class="phase-time">3 - 6+ năm</div>
+          <div class="phase-desc">Kiến trúc hệ thống phức tạp, mentor team và định hướng.</div>
+        </a>
+      </div>
+      
+      <div class="overview-split-label">3 NHÁNH CHẠY SONG SONG TRONG LỘ TRÌNH</div>
+      
+      <!-- Split tracks -->
+      <div class="overview-tracks">
+        <a class="track-card technical" href="#/05-Technical-Deep-Dives/README">
+          <div class="track-icon">🔬</div>
+          <div class="track-title">Technical Deep Dives</div>
+          <div class="track-desc">Đào sâu chuyên môn kỹ thuật: Architecture, Physics, Rendering, Multiplayer.</div>
+        </a>
+        <a class="track-card studio" href="#/07-Interview-and-Portfolio/README">
+          <div class="track-icon">🏢</div>
+          <div class="track-title">Công Ty / Studio</div>
+          <div class="track-desc">Quy trình làm việc nhóm chuyên nghiệp, Git, Portfolio và phỏng vấn.</div>
+        </a>
+        <a class="track-card indie" href="#/06-Indie-Track/README">
+          <div class="track-icon">🎨</div>
+          <div class="track-title">Indie Game Track</div>
+          <div class="track-desc">Kỹ năng sinh tồn cho Indie Dev: Game design, Production, Scope, Marketing.</div>
+        </a>
+      </div>
+    </div>
+  `;
 }
 
 function renderCareerPathsDiagram() {
