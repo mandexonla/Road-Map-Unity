@@ -527,9 +527,9 @@
   border-radius: var(--radius-md);
   border: 1px solid var(--code-border);
   overflow-x: auto;
-  text-align: center;
-  font-size: 0.9rem;
-  line-height: 1.5;
+  text-align: left; /* FIX: Keep monospaced lines aligned! */
+  font-size: 0.85rem;
+  line-height: 1.4;
   color: var(--text-primary);
   margin-bottom: 20px;
   white-space: pre;

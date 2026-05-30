@@ -341,6 +341,41 @@ function setupContentDelegation() {
       });
       return;
     }
+
+    // ── Virtual Inspector Component Header clicks ──
+    const compHeader = e.target.closest('.comp-header');
+    if (compHeader) {
+      e.preventDefault();
+      const comp = compHeader.closest('.inspector-component');
+      if (comp) {
+        const isExpanded = comp.classList.contains('expanded');
+        comp.classList.toggle('expanded', !isExpanded);
+        const arrow = compHeader.querySelector('.comp-arrow');
+        if (arrow) {
+          arrow.textContent = isExpanded ? '▶' : '▼';
+        }
+      }
+      return;
+    }
+
+    // ── Lifecycle Step clicks ──
+    const step = e.target.closest('.lifecycle-step');
+    if (step) {
+      e.preventDefault();
+      const isActive = step.classList.contains('active');
+      
+      // Close other steps
+      const timeline = step.closest('.lifecycle-timeline');
+      if (timeline) {
+        const allSteps = timeline.querySelectorAll('.lifecycle-step');
+        allSteps.forEach(s => {
+          if (s !== step) s.classList.remove('active');
+        });
+      }
+      
+      step.classList.toggle('active', !isActive);
+      return;
+    }
   });
 }
 
