@@ -8,6 +8,7 @@ import { initMarkdown, renderMarkdown, renderMermaidDiagrams } from './markdown.
 import { initSidebar, setActiveItem, updateSidebarProgress } from './sidebar.js';
 import { initProgress, getCheckboxState, setCheckboxState, getTotalProgress, getBookProgress, setBookProgress, clearBookProgress } from './progress.js';
 import { initSearch } from './search.js';
+import { initSkillTree } from './skilltree.js';
 
 // ── Constants ────────────────────────────────────────────────────
 const BASE_PATH = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
@@ -98,6 +99,9 @@ async function handleNavigation(path) {
     // Home page has special rendering
     if (path === 'README.md') {
       contentEl.innerHTML = renderHomePage(mdContent, contentIndex);
+      setTimeout(() => {
+        initSkillTree(contentIndex);
+      }, 0);
     } else {
       contentEl.innerHTML = renderMarkdown(mdContent, path);
     }
@@ -188,11 +192,12 @@ function renderHomePage(mdContent, index) {
     `<div class="home-hero">` +
       `<h1 class="home-title">🎮 Lộ Trình Unity Developer</h1>` +
       `<p class="home-subtitle">Từ Intern đến Senior — Tài liệu toàn diện bằng Tiếng Việt</p>` +
-      `<div class="home-roadmap">` +
-        `<div class="home-progress-summary">` +
+      `<div class="home-roadmap-container">` +
+        `<div class="home-progress-summary" style="margin-bottom: 24px;">` +
           `<span class="home-progress-label">Tiến độ tổng thể</span>` +
           `<span class="home-progress-value" id="home-progress-value">${getProgressText()}</span>` +
         `</div>` +
+        `<div id="interactive-skill-tree" class="skill-tree-box"></div>` +
       `</div>` +
     `</div>` +
     `<div class="home-sections">` +
