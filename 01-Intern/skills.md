@@ -2,6 +2,8 @@
 
 [⬅️ Intern Overview](./README.md) | [Projects ➡️](./projects.md)
 
+> 📕 **Muốn hiểu BẢN CHẤT từng khái niệm?** Mỗi mục dưới đây có link 🔎 dẫn tới [**Knowledge Base**](../08-Knowledge-Base/README.md) — giải thích sâu cách hoạt động bên trong, ưu/nhược điểm, lỗi thường gặp. Học ở đây, đừng đi tìm chỗ khác.
+
 ---
 
 ## A. C# Nền Tảng (HỌC TRƯỚC TIÊN — quan trọng nhất)
@@ -39,6 +41,8 @@
 
 ## B. Unity Editor — Hiểu Giao Diện & Khái Niệm
 
+> 🔎 Đọc sâu: [GameObject & Component](../08-Knowledge-Base/intern/gameobject-component.md) · [Transform & Hệ tọa độ](../08-Knowledge-Base/intern/transform.md) · [Prefab](../08-Knowledge-Base/intern/prefab.md) · [Serialization & Inspector](../08-Knowledge-Base/intern/serialization-and-inspector.md)
+
 ### 1. Các khái niệm cốt lõi
 | Khái niệm | Là gì |
 |-----------|-------|
@@ -59,6 +63,8 @@
 ---
 
 ## C. MonoBehaviour — Linh Hồn Của Script Unity
+
+> 🔎 Đọc sâu: [MonoBehaviour & Vòng đời (Lifecycle)](../08-Knowledge-Base/intern/monobehaviour-lifecycle.md) — bản chất game loop, Update vs FixedUpdate, thứ tự thực thi.
 
 ### Vòng đời (Lifecycle) — PHẢI THUỘC
 ```csharp
@@ -84,6 +90,8 @@ OnTriggerEnter(2D)    // Khi vào vùng trigger (xuyên qua, dùng cho vùng ph�
 
 ## D. Vật Lý Cơ Bản
 
+> 🔎 Đọc sâu: [Physics: Rigidbody & Collider](../08-Knowledge-Base/intern/physics-rigidbody-collider.md) — engine vật lý hoạt động thế nào, collision vs trigger, Dynamic/Kinematic/Static, xuyên tường.
+
 - **Rigidbody / Rigidbody2D:** cho object chịu vật lý (trọng lực, lực).
 - **Collider:** hình va chạm (Box, Circle/Sphere, Capsule, Polygon).
 - **Is Trigger:** biến collider thành vùng phát hiện (không đẩy).
@@ -94,6 +102,8 @@ OnTriggerEnter(2D)    // Khi vào vùng trigger (xuyên qua, dùng cho vùng ph�
 ---
 
 ## E. Input
+
+> 🔎 Đọc sâu: [Input](../08-Knowledge-Base/intern/input.md) — polling vs event, Input Manager cũ vs Input System mới, tách input khỏi logic.
 
 - `Input.GetKey / GetKeyDown / GetKeyUp` — bàn phím.
 - `Input.GetAxis("Horizontal")` — trục di chuyển mượt.
