@@ -1,0 +1,473 @@
+{
+  "sections": [
+    {
+      "id": "home",
+      "title": "Trang Chủ",
+      "icon": "🏠",
+      "order": -1,
+      "files": [
+        {
+          "id": "README",
+          "title": "🎮 Lộ Trình Unity Developer: Từ Intern đến Senior",
+          "path": "README.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "id": "00-Overview",
+      "title": "Tổng Quan",
+      "icon": "🧭",
+      "order": 0,
+      "files": [
+        {
+          "id": "career-paths",
+          "title": "🛣️ Các Hướng Nghề Nghiệp Unity Developer",
+          "path": "00-Overview/career-paths.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "how-to-use",
+          "title": "📖 Cách Sử Dụng Bộ Tài Liệu Này",
+          "path": "00-Overview/how-to-use.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "self-assessment",
+          "title": "📊 Cách Tự Đánh Giá Đúng Từng Level",
+          "path": "00-Overview/self-assessment.md",
+          "checkboxCount": 17,
+          "checkedCount": 0
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "id": "01-Intern",
+      "title": "Level 1: Intern",
+      "icon": "🌱",
+      "order": 1,
+      "files": [
+        {
+          "id": "README",
+          "title": "🌱 Level 1: INTERN (Người Mới Bắt Đầu)",
+          "path": "01-Intern/README.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "checklist",
+          "title": "✅ Intern — Checklist Tự Đánh Giá",
+          "path": "01-Intern/checklist.md",
+          "checkboxCount": 33,
+          "checkedCount": 0
+        },
+        {
+          "id": "projects",
+          "title": "🛠️ Intern — Dự Án Thực Hành",
+          "path": "01-Intern/projects.md",
+          "checkboxCount": 18,
+          "checkedCount": 0
+        },
+        {
+          "id": "resources",
+          "title": "📚 Intern — Tài Nguyên Học Tập",
+          "path": "01-Intern/resources.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "skills",
+          "title": "🧠 Intern — Kỹ Năng & Kiến Thức Cần Nắm",
+          "path": "01-Intern/skills.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "id": "02-Junior",
+      "title": "Level 2: Junior",
+      "icon": "🌿",
+      "order": 2,
+      "files": [
+        {
+          "id": "README",
+          "title": "🌿 Level 2: JUNIOR Developer",
+          "path": "02-Junior/README.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "checklist",
+          "title": "✅ Junior — Checklist Tự Đánh Giá",
+          "path": "02-Junior/checklist.md",
+          "checkboxCount": 38,
+          "checkedCount": 0
+        },
+        {
+          "id": "projects",
+          "title": "🛠️ Junior — Dự Án Thực Hành",
+          "path": "02-Junior/projects.md",
+          "checkboxCount": 16,
+          "checkedCount": 0
+        },
+        {
+          "id": "resources",
+          "title": "📚 Junior — Tài Nguyên Học Tập",
+          "path": "02-Junior/resources.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "skills",
+          "title": "🧠 Junior — Kỹ Năng & Kiến Thức Cần Nắm",
+          "path": "02-Junior/skills.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "id": "03-Mid-Level",
+      "title": "Level 3: Mid-Level",
+      "icon": "🌳",
+      "order": 3,
+      "files": [
+        {
+          "id": "README",
+          "title": "🌳 Level 3: MID-LEVEL Developer",
+          "path": "03-Mid-Level/README.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "checklist",
+          "title": "✅ Mid-Level — Checklist Tự Đánh Giá",
+          "path": "03-Mid-Level/checklist.md",
+          "checkboxCount": 34,
+          "checkedCount": 0
+        },
+        {
+          "id": "projects",
+          "title": "🛠️ Mid-Level — Dự Án Thực Hành",
+          "path": "03-Mid-Level/projects.md",
+          "checkboxCount": 21,
+          "checkedCount": 0
+        },
+        {
+          "id": "resources",
+          "title": "📚 Mid-Level — Tài Nguyên Học Tập",
+          "path": "03-Mid-Level/resources.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "skills",
+          "title": "🧠 Mid-Level — Kỹ Năng & Kiến Thức Cần Nắm",
+          "path": "03-Mid-Level/skills.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "id": "04-Senior",
+      "title": "Level 4: Senior",
+      "icon": "🏔️",
+      "order": 4,
+      "files": [
+        {
+          "id": "README",
+          "title": "🏔️ Level 4: SENIOR Developer",
+          "path": "04-Senior/README.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "checklist",
+          "title": "✅ Senior — Checklist Tự Đánh Giá",
+          "path": "04-Senior/checklist.md",
+          "checkboxCount": 35,
+          "checkedCount": 0
+        },
+        {
+          "id": "projects",
+          "title": "🛠️ Senior — Thử Thách & Cách Rèn Luyện",
+          "path": "04-Senior/projects.md",
+          "checkboxCount": 5,
+          "checkedCount": 0
+        },
+        {
+          "id": "resources",
+          "title": "📚 Senior — Tài Nguyên Học Tập",
+          "path": "04-Senior/resources.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "skills",
+          "title": "🧠 Senior — Kỹ Năng & Kiến Thức Cần Nắm",
+          "path": "04-Senior/skills.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "id": "05-Technical-Deep-Dives",
+      "title": "Technical Deep Dives",
+      "icon": "🔬",
+      "order": 5,
+      "files": [
+        {
+          "id": "README",
+          "title": "🔬 Technical Deep Dives — Kiến Thức Kỹ Thuật Chuyên Sâu",
+          "path": "05-Technical-Deep-Dives/README.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "architecture",
+          "title": "🏛️ Kiến Trúc Phần Mềm trong Unity",
+          "path": "05-Technical-Deep-Dives/architecture.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "build-and-pipeline",
+          "title": "📦 Build, Asset Pipeline & CI/CD",
+          "path": "05-Technical-Deep-Dives/build-and-pipeline.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "gameplay-systems",
+          "title": "🎮 Gameplay Systems (Gameplay Programmer)",
+          "path": "05-Technical-Deep-Dives/gameplay-systems.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "graphics-and-rendering",
+          "title": "🎨 Graphics & Rendering (Graphics/Rendering Engineer)",
+          "path": "05-Technical-Deep-Dives/graphics-and-rendering.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "memory-management",
+          "title": "🧠 Quản Lý Bộ Nhớ trong Unity",
+          "path": "05-Technical-Deep-Dives/memory-management.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "multiplayer-networking",
+          "title": "🌐 Multiplayer & Networking (Multiplayer/Backend Engineer)",
+          "path": "05-Technical-Deep-Dives/multiplayer-networking.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "performance",
+          "title": "🚀 Tối Ưu Hiệu Năng trong Unity",
+          "path": "05-Technical-Deep-Dives/performance.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "tools-and-editor",
+          "title": "🔧 Tools & Editor Programming (Tools/Engine Programmer)",
+          "path": "05-Technical-Deep-Dives/tools-and-editor.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "version-control",
+          "title": "🔀 Version Control (Git) cho Unity",
+          "path": "05-Technical-Deep-Dives/version-control.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "id": "06-Indie-Track",
+      "title": "Indie Track",
+      "icon": "🎨",
+      "order": 6,
+      "files": [
+        {
+          "id": "README",
+          "title": "🎨 Indie Track — Lộ Trình Làm Game Indie Toàn Diện",
+          "path": "06-Indie-Track/README.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "art-and-audio",
+          "title": "🖼️ Art & Audio cho Indie Developer",
+          "path": "06-Indie-Track/art-and-audio.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "business-and-funding",
+          "title": "💰 Business, Funding & Pháp Lý cho Indie",
+          "path": "06-Indie-Track/business-and-funding.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "game-design",
+          "title": "🎯 Game Design cho Indie Developer",
+          "path": "06-Indie-Track/game-design.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "marketing-and-release",
+          "title": "📣 Marketing & Phát Hành Game Indie",
+          "path": "06-Indie-Track/marketing-and-release.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "production-and-scope",
+          "title": "📐 Production & Scope — Kỹ Năng Sống Còn Của Indie",
+          "path": "06-Indie-Track/production-and-scope.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "id": "07-Interview-and-Portfolio",
+      "title": "Interview & Portfolio",
+      "icon": "💼",
+      "order": 7,
+      "files": [
+        {
+          "id": "README",
+          "title": "💼 Phỏng Vấn, Portfolio & Thị Trường",
+          "path": "07-Interview-and-Portfolio/README.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "interview-prep",
+          "title": "🎤 Chuẩn Bị Phỏng Vấn Unity Developer",
+          "path": "07-Interview-and-Portfolio/interview-prep.md",
+          "checkboxCount": 7,
+          "checkedCount": 0
+        },
+        {
+          "id": "market-and-salary",
+          "title": "📈 Thị Trường, Lương & Đánh Giá Theo Level",
+          "path": "07-Interview-and-Portfolio/market-and-salary.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        },
+        {
+          "id": "portfolio",
+          "title": "🎨 Xây Dựng Portfolio Unity",
+          "path": "07-Interview-and-Portfolio/portfolio.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        }
+      ],
+      "subsections": []
+    },
+    {
+      "id": "08-Knowledge-Base",
+      "title": "Knowledge Base",
+      "icon": "📚",
+      "order": 8,
+      "files": [
+        {
+          "id": "README",
+          "title": "📕 Knowledge Base — Thư Viện Kiến Thức Chi Tiết",
+          "path": "08-Knowledge-Base/README.md",
+          "checkboxCount": 0,
+          "checkedCount": 0
+        }
+      ],
+      "subsections": [
+        {
+          "id": "intern",
+          "title": "Intern Level",
+          "icon": "🌱",
+          "files": [
+            {
+              "id": "gameobject-component",
+              "title": "🧩 GameObject & Component",
+              "path": "08-Knowledge-Base/intern/gameobject-component.md",
+              "checkboxCount": 0,
+              "checkedCount": 0
+            },
+            {
+              "id": "input",
+              "title": "🎮 Input (Xử Lý Đầu Vào)",
+              "path": "08-Knowledge-Base/intern/input.md",
+              "checkboxCount": 0,
+              "checkedCount": 0
+            },
+            {
+              "id": "instantiate-destroy",
+              "title": "♻️ Instantiate & Destroy (Tạo & Hủy Object)",
+              "path": "08-Knowledge-Base/intern/instantiate-destroy.md",
+              "checkboxCount": 0,
+              "checkedCount": 0
+            },
+            {
+              "id": "monobehaviour-lifecycle",
+              "title": "🔄 MonoBehaviour & Vòng Đời (Lifecycle)",
+              "path": "08-Knowledge-Base/intern/monobehaviour-lifecycle.md",
+              "checkboxCount": 0,
+              "checkedCount": 0
+            },
+            {
+              "id": "physics-rigidbody-collider",
+              "title": "⚙️ Physics: Rigidbody & Collider",
+              "path": "08-Knowledge-Base/intern/physics-rigidbody-collider.md",
+              "checkboxCount": 0,
+              "checkedCount": 0
+            },
+            {
+              "id": "prefab",
+              "title": "🧱 Prefab (Khuôn Object Tái Sử Dụng)",
+              "path": "08-Knowledge-Base/intern/prefab.md",
+              "checkboxCount": 0,
+              "checkedCount": 0
+            },
+            {
+              "id": "serialization-and-inspector",
+              "title": "💾 Serialization & Inspector",
+              "path": "08-Knowledge-Base/intern/serialization-and-inspector.md",
+              "checkboxCount": 0,
+              "checkedCount": 0
+            },
+            {
+              "id": "transform",
+              "title": "📐 Transform & Hệ Tọa Độ",
+              "path": "08-Knowledge-Base/intern/transform.md",
+              "checkboxCount": 0,
+              "checkedCount": 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

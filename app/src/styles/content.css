@@ -1,0 +1,753 @@
+/* ============================================================
+   Content — Markdown Body & Rich Content Styling
+   Premium typography, code blocks, alerts, and more
+   ============================================================ */
+
+/* --- Content Container --- */
+.content.markdown-body {
+  max-width: var(--content-max-width);
+  margin: 0 auto;
+  padding: 32px 40px 80px;
+  color: var(--text-primary);
+  animation: fadeIn 0.35s ease-out;
+}
+
+/* ============================================================
+   Typography
+   ============================================================ */
+
+.markdown-body h1 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  margin-top: 0;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-size: 200% 200%;
+  animation: gradientShift 4s ease infinite;
+}
+
+.markdown-body h2 {
+  font-size: 1.55rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 48px;
+  margin-bottom: 16px;
+  padding-bottom: 10px;
+  padding-left: 16px;
+  border-left: 4px solid var(--accent);
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  position: relative;
+}
+
+.markdown-body h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 36px;
+  margin-bottom: 12px;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+
+.markdown-body h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-top: 28px;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.markdown-body h5 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 24px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.markdown-body h6 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 20px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.markdown-body p {
+  margin-bottom: 16px;
+  line-height: 1.75;
+  color: var(--text-primary);
+}
+
+.markdown-body a {
+  color: var(--accent-light);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all var(--transition);
+  border-bottom: 1px solid transparent;
+}
+
+.markdown-body a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.markdown-body strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.markdown-body em {
+  font-style: italic;
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   Lists
+   ============================================================ */
+
+.markdown-body ul {
+  margin-bottom: 16px;
+  padding-left: 8px;
+}
+
+.markdown-body ul li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 8px;
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.markdown-body ul li::before {
+  content: '';
+  position: absolute;
+  left: 2px;
+  top: 11px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.7;
+}
+
+/* Nested unordered list bullets */
+.markdown-body ul ul li::before {
+  border-radius: 1px;
+  width: 5px;
+  height: 5px;
+  background: transparent;
+  border: 1.5px solid var(--accent-light);
+  opacity: 0.6;
+}
+
+.markdown-body ul ul ul li::before {
+  width: 5px;
+  height: 1.5px;
+  border-radius: 0;
+  border: none;
+  background: var(--text-muted);
+  top: 13px;
+}
+
+.markdown-body ol {
+  margin-bottom: 16px;
+  padding-left: 8px;
+  counter-reset: ol-counter;
+}
+
+.markdown-body ol li {
+  position: relative;
+  padding-left: 28px;
+  margin-bottom: 8px;
+  line-height: 1.7;
+  color: var(--text-primary);
+  counter-increment: ol-counter;
+}
+
+.markdown-body ol li::before {
+  content: counter(ol-counter);
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent-glow);
+  color: var(--accent-light);
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Nested lists */
+.markdown-body ul ul,
+.markdown-body ol ol,
+.markdown-body ul ol,
+.markdown-body ol ul {
+  margin-top: 6px;
+  margin-bottom: 6px;
+  padding-left: 12px;
+}
+
+/* ============================================================
+   Code — Inline & Block
+   ============================================================ */
+
+/* Inline code */
+.markdown-body code {
+  background: var(--bg-surface);
+  color: var(--accent-light);
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+/* Code block wrapper */
+.code-block-wrapper {
+  position: relative;
+  margin-bottom: 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--code-border);
+  overflow: hidden;
+  background: var(--code-bg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition);
+}
+
+.code-block-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--accent-gradient);
+  border-radius: 3px 0 0 3px;
+}
+
+.code-block-wrapper:hover {
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+/* Code header (language + copy button) */
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  font-size: 0.78rem;
+}
+
+.code-lang {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.code-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.code-copy:hover {
+  color: var(--accent-light);
+  background: var(--accent-glow);
+  border-color: var(--accent);
+}
+
+.code-copy.copied {
+  color: var(--success);
+  border-color: var(--success);
+  background: var(--success-bg);
+}
+
+/* Pre/code inside block wrapper */
+.code-block-wrapper pre {
+  margin: 0;
+  padding: 16px 20px;
+  overflow-x: auto;
+  background: transparent;
+  border: none;
+}
+
+.code-block-wrapper pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+  white-space: pre;
+  display: block;
+}
+
+/* Standalone pre (no wrapper) */
+.markdown-body pre {
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.markdown-body pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 0.875rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+  white-space: pre;
+}
+
+/* ============================================================
+   Tables
+   ============================================================ */
+
+.markdown-body table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.markdown-body thead {
+  background: var(--bg-surface);
+}
+
+.markdown-body th {
+  padding: 12px 16px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--text-primary);
+  border-bottom: 2px solid var(--border-strong);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.markdown-body td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.markdown-body tbody tr:nth-child(even) {
+  background: rgba(148, 163, 184, 0.03);
+}
+
+.markdown-body tbody tr:hover {
+  background: var(--bg-hover);
+  transition: background var(--transition);
+}
+
+.markdown-body tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Responsive table wrapper */
+.markdown-body .table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.markdown-body .table-wrapper table {
+  margin-bottom: 0;
+  border: none;
+  border-radius: 0;
+}
+
+/* ============================================================
+   Alerts (Styled Blockquotes)
+   ============================================================ */
+
+.alert {
+  display: flex;
+  gap: 12px;
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  border-radius: var(--radius-md);
+  border-left: 4px solid var(--text-muted);
+  background: var(--bg-surface);
+  line-height: 1.65;
+  position: relative;
+  overflow: hidden;
+}
+
+.alert::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, transparent 60%, rgba(255, 255, 255, 0.02));
+  pointer-events: none;
+}
+
+.alert-icon {
+  font-size: 1.15rem;
+  line-height: 1.6;
+  flex-shrink: 0;
+}
+
+.alert-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-content p {
+  margin-bottom: 8px;
+}
+
+.alert-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* Alert variants */
+.alert-tip {
+  border-left-color: var(--success);
+  background: var(--success-bg);
+}
+
+.alert-warning {
+  border-left-color: var(--warning);
+  background: var(--warning-bg);
+}
+
+.alert-important {
+  border-left-color: var(--info);
+  background: var(--info-bg);
+}
+
+.alert-note {
+  border-left-color: var(--text-muted);
+  background: var(--bg-surface);
+}
+
+/* ============================================================
+   Checkboxes
+   ============================================================ */
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  margin-bottom: 6px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition);
+  user-select: none;
+}
+
+.checkbox-item:hover {
+  background: var(--bg-hover);
+}
+
+.checkbox-item input[type="checkbox"] {
+  display: none;
+}
+
+.checkbox-item::before {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 2px solid var(--border-strong);
+  flex-shrink: 0;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.checkbox-item.checked::before {
+  background: var(--accent);
+  border-color: var(--accent);
+  /* Checkmark via background */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 12px;
+  transform: scale(1.05);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.checkbox-item.checked {
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   ASCII Diagrams
+   ============================================================ */
+
+.diagram-block {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  background: var(--code-bg);
+  padding: 24px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--code-border);
+  overflow-x: auto;
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+  white-space: pre;
+}
+
+/* ============================================================
+   Difficulty Badges
+   ============================================================ */
+
+.difficulty-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.difficulty-badge.beginner {
+  background: var(--success-bg);
+  color: var(--success);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.difficulty-badge.intermediate {
+  background: var(--warning-bg);
+  color: var(--warning);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.difficulty-badge.advanced {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+/* ============================================================
+   Content Navigation (Prev / Next)
+   ============================================================ */
+
+.content-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+.content-nav-link {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  text-decoration: none;
+  flex: 1;
+  max-width: 50%;
+  transition: all var(--transition);
+}
+
+.content-nav-link:hover {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.content-nav-link:first-child {
+  text-align: left;
+}
+
+.content-nav-link:last-child {
+  text-align: right;
+}
+
+.content-nav-link small {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.content-nav-link span {
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+/* ============================================================
+   Updating Notice
+   ============================================================ */
+
+.updating-notice {
+  text-align: center;
+  padding: 40px 24px;
+  margin: 32px 0;
+  background: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.updating-notice::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  margin-right: 10px;
+  vertical-align: middle;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* ============================================================
+   Horizontal Rules
+   ============================================================ */
+
+.markdown-body hr {
+  border: none;
+  height: 2px;
+  margin: 36px 0;
+  background: var(--accent-gradient);
+  opacity: 0.3;
+  border-radius: 999px;
+}
+
+/* ============================================================
+   Images
+   ============================================================ */
+
+.markdown-body img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  margin: 8px 0 16px;
+}
+
+/* ============================================================
+   Blockquote (non-alert)
+   ============================================================ */
+
+.markdown-body blockquote {
+  border-left: 4px solid var(--border-strong);
+  padding: 12px 20px;
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-style: italic;
+}
+
+.markdown-body blockquote p {
+  margin-bottom: 0;
+}
+
+/* ============================================================
+   Mermaid Container
+   ============================================================ */
+
+.mermaid-container {
+  display: flex;
+  justify-content: center;
+  padding: 24px 16px;
+  margin: 16px 0;
+  max-width: 100%;
+  overflow-x: auto;
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+/* ============================================================
+   Responsive — Mobile
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .content.markdown-body {
+    padding: 20px 18px 60px;
+  }
+
+  .markdown-body h1 {
+    font-size: 1.6rem;
+  }
+
+  .markdown-body h2 {
+    font-size: 1.3rem;
+    margin-top: 32px;
+  }
+
+  .markdown-body h3 {
+    font-size: 1.1rem;
+  }
+
+  .content-nav {
+    flex-direction: column;
+  }
+
+  .content-nav-link {
+    max-width: 100%;
+  }
+
+  .markdown-body table {
+    font-size: 0.82rem;
+  }
+
+  .markdown-body th,
+  .markdown-body td {
+    padding: 8px 10px;
+  }
+}

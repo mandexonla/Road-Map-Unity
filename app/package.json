@@ -1,0 +1,19 @@
+{
+  "name": "unity-roadmap-vietnam",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Unity Developer Roadmap - Vietnam",
+  "scripts": {
+    "dev": "node scripts/build-content.js && vite",
+    "build": "node scripts/build-content.js && vite build",
+    "preview": "vite preview",
+    "content": "node scripts/build-content.js"
+  },
+  "devDependencies": {
+    "vite": "^6.0.0"
+  },
+  "dependencies": {
+    "marked": "^15.0.0",
+    "highlight.js": "^11.11.0"
+  }
+}

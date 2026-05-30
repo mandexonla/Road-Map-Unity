@@ -1,0 +1,17 @@
+# Dependency directories
+app/node_modules/
+node_modules/
+
+# Production build outputs
+app/dist/
+dist/
+
+# OS/Editor specific files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
