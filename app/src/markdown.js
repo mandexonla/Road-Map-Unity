@@ -154,21 +154,35 @@ export function initMarkdown() {
 
   // ── Links → SPA routing for .md links ────────────────────────
   renderer.link = function ({ href, title, text }) {
-    // Handle tokens passed as text
     const linkText = typeof text === 'string' ? text : '';
     const titleAttr = title ? ` title="${escapeHtml(title)}"` : '';
 
     if (!href) return `<a${titleAttr}>${linkText}</a>`;
 
-    // Relative .md links → hash routes
-    if ((href.startsWith('./') || href.startsWith('../')) && href.endsWith('.md')) {
-      const resolved = resolveRelativePath(currentFilePath, href);
-      const hashRoute = '#/' + resolved.replace(/\.md$/, '');
-      return `<a href="${hashRoute}"${titleAttr}>${linkText}</a>`;
+    const isExternal = href.startsWith('http://') || href.startsWith('https://') || href.startsWith('//') || href.startsWith('mailto:') || href.startsWith('tel:');
+    const isAnchor = href.startsWith('#');
+
+    if (!isExternal && !isAnchor) {
+      let relativeHref = href;
+      // If it points to a directory (ends with / or has no extension)
+      if (relativeHref.endsWith('/')) {
+        relativeHref += 'README.md';
+      } else {
+        const lastSegment = relativeHref.split('/').pop();
+        if (!lastSegment.includes('.')) {
+          relativeHref += '/README.md';
+        }
+      }
+
+      if (relativeHref.endsWith('.md')) {
+        const resolved = resolveRelativePath(currentFilePath, relativeHref);
+        const hashRoute = '#/' + resolved.replace(/\.md$/, '');
+        return `<a href="${hashRoute}"${titleAttr}>${linkText}</a>`;
+      }
     }
 
     // External links
-    if (href.startsWith('http://') || href.startsWith('https://')) {
+    if (isExternal) {
       return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener"${titleAttr}>${linkText}</a>`;
     }
 
@@ -272,25 +286,36 @@ export function renderMarkdown(mdContent, filePath) {
   const bodyLines = [];
   
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    // Detect navigation line
-    if (line.startsWith('[⬅️') || line.startsWith('[⏮️') || line.endsWith('➡️]') || 
-        line.endsWith('➡️') || (line.includes('⬅️') && line.includes('➡️') && line.includes('|')) ||
-        (line.startsWith('[⬅️') && line.includes('|'))) {
-      
-      // Find all markdown links in this line
+    const rawLine = lines[i];
+    const line = rawLine.replace(/\r$/, '').trim();
+    
+    const hasNavEmoji = line.includes('⬅️') || line.includes('➡️') || line.includes('⏮️') || line.includes('⏭️') || line.includes('◀️') || line.includes('▶️') || line.includes('Bài trước') || line.includes('Bài tiếp theo');
+    const hasLink = line.includes('[') && line.includes('](');
+    
+    if (hasNavEmoji && hasLink) {
       const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
       let match;
+      let foundNav = false;
+      
       while ((match = linkRegex.exec(line)) !== null) {
         const label = match[1].trim();
         const path = match[2].trim();
-        if (label.includes('⬅️') || label.includes('Bài trước') || label.includes('Hướng nghề nghiệp') || label.includes('Cách dùng')) {
-          prevLink = { label: label.replace('⬅️', '').trim(), path };
-        } else if (label.includes('➡️') || label.includes('Bài tiếp theo') || label.includes('Cách tự đánh giá') || label.includes('Lộ trình')) {
-          nextLink = { label: label.replace('➡️', '').trim(), path };
+        
+        const isPrev = label.includes('⬅️') || label.includes('Bài trước') || label.includes('⏮️') || label.includes('◀️') || label.includes('Về trang chủ') || label.includes('Cách dùng') || label.includes('Overview') || label.includes('Index');
+        const isNext = label.includes('➡️') || label.includes('Bài tiếp theo') || label.includes('⏭️') || label.includes('▶️') || label.includes('Lên Junior') || label.includes('Lên Mid') || label.includes('Lên Senior') || label.includes('Skills') || label.includes('Projects') || label.includes('Checklist') || label.includes('Performance') || label.includes('checklist');
+        
+        if (isPrev) {
+          prevLink = { label: label.replace(/[⬅️⏮️◀️]/g, '').trim(), path };
+          foundNav = true;
+        } else if (isNext) {
+          nextLink = { label: label.replace(/[➡️⏭️▶️]/g, '').trim(), path };
+          foundNav = true;
         }
       }
-      continue; // Skip this line so it doesn't render as raw text
+      
+      if (foundNav) {
+        continue; // Skip this line from rendering
+      }
     }
     
     // Also skip standard dividers right under top navigation
@@ -298,7 +323,7 @@ export function renderMarkdown(mdContent, filePath) {
       continue;
     }
     
-    bodyLines.push(lines[i]);
+    bodyLines.push(rawLine);
   }
   
   cleanMd = bodyLines.join('\n');
@@ -439,27 +464,80 @@ function escapeHtml(str) {
 // ── Interactive Diagrams Renderers ─────────────────────────────────
 
 function tryRenderInteractiveDiagram(code) {
-  if (code.includes('INTERN -> JUNIOR -> MID -> SENIOR') || (code.includes('TECHNICAL') && code.includes('CÔNG TY'))) {
+  const normalized = code.replace(/\r/g, '');
+
+  if (normalized.includes('INTERN -> JUNIOR -> MID -> SENIOR') || (normalized.includes('TECHNICAL') && normalized.includes('CÔNG TY'))) {
     return renderOverviewDiagram();
   }
-  if (code.includes('UNITY DEVELOPER') && code.includes('Gameplay')) {
+  if (normalized.includes('UNITY DEVELOPER') && normalized.includes('Gameplay') && normalized.includes('Tools/Engine')) {
     return renderCareerPathsDiagram();
   }
-  if (code.includes('TECHNICAL DEEP DIVES') && code.includes('Nền tảng')) {
+  if (normalized.includes('TECHNICAL DEEP DIVES') && normalized.includes('Nền tảng')) {
     return renderTechnicalDivesDiagram();
   }
-  if (code.includes('MANAGED MEMORY') && code.includes('NATIVE MEMORY')) {
+  if (normalized.includes('MANAGED MEMORY') && normalized.includes('NATIVE MEMORY')) {
     return renderMemoryDiagram();
   }
-  if (code.includes('MỘT GAME INDIE THÀNH CÔNG')) {
+  if (normalized.includes('MỘT GAME INDIE THÀNH CÔNG CẦN:')) {
     return renderIndiePillarsDiagram();
   }
-  if (code.includes('GameObject "Player"')) {
+  if (normalized.includes('GameObject "Player"')) {
     return renderInspectorDiagram();
   }
-  if (code.includes('MỘT FRAME')) {
+  if (normalized.includes('MỘT FRAME') && normalized.includes('Vòng lặp Vật lý')) {
     return renderLifecycleDiagram();
   }
+  
+  // New diagrams
+  if (normalized.includes('Mô hình chữ T của Senior') && normalized.includes('Kiến thức rộng')) {
+    return renderTModelDiagram();
+  }
+  if (normalized.includes('Học khái niệm → Áp dụng') || normalized.includes('Tự debug → Hỏi')) {
+    return renderLearningCycleDiagram();
+  }
+  if (normalized.includes('C# nền tảng ──► MonoBehaviour')) {
+    return renderInternSkillsDiagram();
+  }
+  if (normalized.includes('C# trung cấp ──► Clean Code')) {
+    return renderJuniorSkillsDiagram();
+  }
+  if (normalized.includes('SOLID + DI + Layering ──►')) {
+    return renderMidSkillsDiagram();
+  }
+  if (normalized.includes('TECHNICAL MASTERY') && normalized.includes('JUDGEMENT') && normalized.includes('LEADERSHIP')) {
+    return renderSeniorSkillsDiagram();
+  }
+  if (normalized.includes('Push → Lint/Format → Compile')) {
+    return renderPipelineDiagram();
+  }
+  if (normalized.includes('Input → Update() → Physics(FixedUpdate)')) {
+    return renderFrameLifecycleDiagram();
+  }
+  if (normalized.includes('main (luôn ổn định)') && normalized.includes('feature/')) {
+    return renderGitTreeDiagram();
+  }
+  if (normalized.includes('Ý tưởng → Prototype') && normalized.includes('TEST: có vui không?')) {
+    return renderDesignLoopDiagram();
+  }
+  if (normalized.includes('Bắt đầu làm game  → Bắt đầu post devlog')) {
+    return renderMarketingRoadmapDiagram();
+  }
+  if (normalized.includes('Screening (CV + portfolio)') && normalized.includes('Coding test')) {
+    return renderInterviewStepsDiagram();
+  }
+  if (normalized.includes('Junior → Mid → Senior → ┬→ Tech Lead')) {
+    return renderCareerBranchingDiagram();
+  }
+  if (normalized.includes('Entity') && normalized.includes('Character') && normalized.includes('FlyingEnemy')) {
+    return renderUnityHierarchyDiagram();
+  }
+  if (normalized.includes('FixedUpdate() của bạn') && normalized.includes('Engine di chuyển các Rigidbody')) {
+    return renderPhysicsPipelineDiagram();
+  }
+  if (normalized.includes('Player (cha)') && normalized.includes('Torch (con)')) {
+    return renderParentChildDiagram();
+  }
+  
   return null;
 }
 
@@ -816,6 +894,507 @@ function renderLifecycleDiagram() {
           </div>
         </div>
       </div>
+    </div>
+  `;
+}
+
+function renderTModelDiagram() {
+  return `
+    <div class="interactive-diagram t-model-diagram">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Mô hình chữ T</span>
+        <h3>📐 MÔ HÌNH CHỮ T (T-SHAPED) CỦA SENIOR DEV</h3>
+      </div>
+      <div class="t-model-container">
+        <div class="t-horizontal-bar">
+          <div class="t-bar-title">Kiến thức rộng (Generalist)</div>
+          <div class="t-bar-pills">
+            <span class="t-pill">C# Core</span>
+            <span class="t-pill">Unity Editor</span>
+            <span class="t-pill">Git</span>
+            <span class="t-pill">Vật lý 2D/3D</span>
+            <span class="t-pill">UI System</span>
+            <span class="t-pill">Audio</span>
+            <span class="t-pill">Save/Load</span>
+            <span class="t-pill">Math/Vector</span>
+          </div>
+        </div>
+        <div class="t-vertical-stem-container">
+          <div class="t-vertical-stem">
+            <div class="stem-title">Chuyên sâu 1 mảng (Specialist)</div>
+            <div class="stem-options">
+              <div class="stem-option" data-desc="⚔️ Gameplay: Thiết kế cơ chế game linh hoạt, AI hành vi phức tạp, combat system, game loop, UI logic & state.">⚔️ Gameplay</div>
+              <div class="stem-option" data-desc="🛠️ Tools/Engine: Viết Custom Editor Window, Property Drawers, automation build pipeline giúp tăng 2-3x hiệu suất team.">🛠️ Tools/Engine</div>
+              <div class="stem-option" data-desc="🎨 Graphics: Shader Graph/HLSL, Custom Render Passes URP, VFX Graph, tối ưu hóa GPU render.">🎨 Graphics/VFX</div>
+              <div class="stem-option" data-desc="🌐 Multiplayer: Netcode for GameObjects, socket server, đồng bộ hóa state, Client Prediction, Server Authority.">🌐 Multiplayer</div>
+            </div>
+            <div class="stem-desc-bubble">Rê chuột hoặc nhấp vào một mảng chuyên sâu để xem chi tiết...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderLearningCycleDiagram() {
+  return `
+    <div class="interactive-diagram learning-cycle-diagram">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Chu kỳ học</span>
+        <h3>🔄 CHU KỲ HỌC TẬP HIỆU QUẢ TRONG LẬP TRÌNH</h3>
+      </div>
+      <div class="cycle-steps">
+        <div class="cycle-step" data-idx="1"><span class="step-icon">📖</span><span class="step-name">1. Học khái niệm</span></div>
+        <div class="cycle-arrow">➔</div>
+        <div class="cycle-step" data-idx="2"><span class="step-icon">🚀</span><span class="step-name">2. Áp dụng dự án</span></div>
+        <div class="cycle-arrow">➔</div>
+        <div class="cycle-step" data-idx="3"><span class="step-icon">⚠️</span><span class="step-name">3. Gặp lỗi/Bug</span></div>
+        <div class="cycle-arrow">➔</div>
+        <div class="cycle-step" data-idx="4"><span class="step-icon">🔍</span><span class="step-name">4. Tự debug</span></div>
+      </div>
+      <div class="cycle-steps second-row" style="margin-top: 16px;">
+        <div class="cycle-step" data-idx="7"><span class="step-icon">📝</span><span class="step-name">7. Ghi chú lại</span></div>
+        <div class="cycle-arrow">◄</div>
+        <div class="cycle-step" data-idx="6"><span class="step-icon">🧠</span><span class="step-name">6. Hiểu sâu hơn</span></div>
+        <div class="cycle-arrow">◄</div>
+        <div class="cycle-step" data-idx="5"><span class="step-icon">💬</span><span class="step-name">5. Hỏi/Tra cứu</span></div>
+      </div>
+      <div class="cycle-desc-box">
+        Nhấp vào một bước bất kỳ để xem chi tiết cách thực hiện hiệu quả...
+      </div>
+    </div>
+  `;
+}
+
+function renderInternSkillsDiagram() {
+  return `
+    <div class="interactive-diagram skills-path-diagram intern-skills">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Intern Skills</span>
+        <h3>🌱 BẢN ĐỒ PHỤ THUỘC KIẾN THỨC INTERN</h3>
+      </div>
+      <div class="skills-flow-grid">
+        <div class="skill-card active" data-desc="C# Nền Tảng: Biến, vòng lặp, hàm, class, OOP căn bản (kế thừa, đóng gói), List, enum. Bắt buộc phải học vững trước.">C# Nền tảng</div>
+        <div class="flow-arrow">➔</div>
+        <div class="skill-card" data-desc="MonoBehaviour: Hiểu Awake, Start, Update, FixedUpdate, LateUpdate và cách engine Unity chạy game loop.">MonoBehaviour</div>
+        <div class="flow-arrow">➔</div>
+        <div class="skill-card" data-desc="Vật lý & Input: Thao tác Rigidbody, Collider, va chạm Collision/Trigger và Input.GetKey để điều khiển nhân vật.">Vật lý + Input</div>
+        <div class="flow-arrow">➔</div>
+        <div class="skill-card" data-desc="UI & Audio: Sử dụng Canvas, Button, TextMeshPro, AudioSource để làm âm thanh sfx và giao diện điểm số.">UI + Audio</div>
+        <div class="flow-arrow">➔</div>
+        <div class="skill-card" data-desc="Game Hoàn Chỉnh: Kết hợp toàn bộ kiến thức để tự code xong 2-3 game nhỏ hoàn chỉnh (Pong, Flappy Bird, Brick Breaker).">Game hoàn chỉnh</div>
+      </div>
+      <div class="git-debug-track">
+        <div class="track-line-up"></div>
+        <div class="skill-card track-card" data-desc="Git + Debug: Quản lý mã nguồn bằng Git (commit, push, branch), đọc hiểu Console log và đặt breakpoint debug. Học song song.">Git + Debug (Xuyên suốt)</div>
+        <div class="track-line-down"></div>
+      </div>
+      <div class="skill-desc-box">Nhấp vào từng ô kỹ năng để xem chi tiết yêu cầu...</div>
+    </div>
+  `;
+}
+
+function renderJuniorSkillsDiagram() {
+  return `
+    <div class="interactive-diagram skills-path-diagram junior-skills">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Junior Skills</span>
+        <h3>🌿 BẢN ĐỒ PHỤ THUỘC KIẾN THỨC JUNIOR</h3>
+      </div>
+      <div class="skills-flow-layout">
+        <div class="flow-row">
+          <div class="skill-card active" data-desc="C# Trung Cấp: Sử dụng nhuần nhuyễn Interface, Abstract Class, Delegate, Event (Action/Func) và Generics.">C# Trung cấp</div>
+          <div class="flow-arrow">➔</div>
+          <div class="skill-card" data-desc="Clean Code: Đặt tên biến/hàm rõ ràng, viết hàm ngắn làm đúng 1 việc, áp dụng nguyên tắc KISS, SRP, DRY.">Clean Code</div>
+          <div class="flow-arrow">➔</div>
+          <div class="skill-card" data-desc="Design Patterns: Hiểu Singleton (dùng hạn chế), Observer (Sự kiện), State Machine cho AI, Object Pool.">Design Patterns</div>
+          <div class="flow-arrow">➔</div>
+          <div class="skill-card" data-desc="Kiến Trúc Cơ Bản: Tư duy tách biệt code logic khỏi UI, giảm coupling chặt chẽ giữa các thành phần.">Kiến Trúc cơ bản</div>
+        </div>
+        <div class="flow-branch-row">
+          <div class="branch-line"></div>
+          <div class="branch-arrow">▼</div>
+        </div>
+        <div class="flow-row">
+          <div class="skill-card" data-desc="ScriptableObject: Dùng ScriptableObject làm cấu hình dữ liệu và xây dựng hệ thống sự kiện SO Event Channel sạch sẽ.">ScriptableObject</div>
+          <div class="flow-arrow">➔</div>
+          <div class="skill-card" data-desc="Hệ Thống Unity Sâu: Sử dụng BlendTree, Animation Events trong Animator, New Input System, Save/Load JSON.">Hệ thống Unity Sâu</div>
+          <div class="flow-arrow">➔</div>
+          <div class="skill-card" data-desc="Profiler & Tối Ưu: Sử dụng Profiler cơ bản để tìm CPU spike, tối ưu GetComponent, pooling và quản lý conflict Git.">Profiler + Tối ưu + Git</div>
+          <div class="flow-arrow">➔</div>
+          <div class="skill-card success-card" data-desc="Sẵn sàng đi làm: Sở hữu portfolio tốt gồm dự án code sạch, hiểu Agile/Scrum và có kỹ năng phỏng vấn cơ bản.">Sẵn sàng đi làm</div>
+        </div>
+      </div>
+      <div class="skill-desc-box">Nhấp vào từng ô kỹ năng để xem chi tiết yêu cầu...</div>
+    </div>
+  `;
+}
+
+function renderMidSkillsDiagram() {
+  return `
+    <div class="interactive-diagram skills-path-diagram mid-skills">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Mid-Level Skills</span>
+        <h3>🌳 BẢN ĐỒ PHỤ THUỘC KIẾN THỨC MID-LEVEL</h3>
+      </div>
+      <div class="skills-flow-layout">
+        <div class="flow-row">
+          <div class="skill-card active" data-desc="SOLID + DI + Layering: Áp dụng SOLID triệt để, tiêm phụ thuộc qua VContainer/Zenject, thiết kế tách lớp MVC/MVP/MVVM.">SOLID + DI + Layering</div>
+          <div class="flow-arrow">➔</div>
+          <div class="skill-card" data-desc="Tư Duy Hệ Thống: Thiết kế mô-đun hóa độc lập, vẽ sơ đồ thiết kế hệ thống và ghi nhận ADR.">Tư duy hệ thống</div>
+          <div class="flow-arrow">➔</div>
+          <div class="skill-card" data-desc="Tự Dựng Hệ Thống Lớn: Khả năng tự mình thiết kế và dựng trọn vẹn các hệ thống lớn (Inventory, Combat).">Tự dựng hệ thống lớn</div>
+        </div>
+        <div class="flow-branch-row">
+          <div class="branch-line-complex"></div>
+        </div>
+        <div class="flow-row">
+          <div class="skill-card" data-desc="Async + Addressables: Sử dụng UniTask cho lập trình bất đồng bộ hiệu năng cao, dùng Addressables quản lý nạp/giải phóng asset.">Async + Addressables</div>
+          <div class="flow-arrow">➔</div>
+          <div class="skill-card" data-desc="Tối Ưu Chuyên Nghiệp: Profile sâu bộ nhớ bằng Memory Profiler, tìm draw call qua Frame Debugger, tối ưu CPU/GPU/RAM.">Tối ưu chuyên nghiệp</div>
+          <div class="skill-card" data-desc="Chuyên Sâu 1 Mảng: Đào sâu chuyên môn T-shaped về Gameplay, Editor Tools, Graphics/Shader, hoặc Multiplayer.">Chuyên sâu 1 mảng</div>
+        </div>
+        <div class="flow-branch-row">
+          <div class="branch-arrow-center">▼</div>
+        </div>
+        <div class="flow-row">
+          <div class="skill-card" data-desc="Testing + CI/CD + Doc: Viết Unit Test và Play Mode Test, tự động hóa build/deploy CI/CD (GitHub Actions), viết technical doc.">Testing + CI/CD + Doc</div>
+          <div class="flow-arrow">➔</div>
+          <div class="skill-card success-card" data-desc="Sẵn sàng lên Senior: Khả năng làm việc độc lập hoàn toàn, mentor đồng đội và đưa quyết định kiến trúc.">Sẵn sàng dẫn dắt (Senior)</div>
+        </div>
+      </div>
+      <div class="skill-desc-box">Nhấp vào từng ô kỹ năng để xem chi tiết yêu cầu...</div>
+    </div>
+  `;
+}
+
+function renderSeniorSkillsDiagram() {
+  return `
+    <div class="interactive-diagram senior-pillars-diagram">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Senior Competencies</span>
+        <h3>🏔️ BA TRỤ CỘT NĂNG LỰC CỦA SENIOR DEVELOPER</h3>
+      </div>
+      <div class="senior-pillars">
+        <div class="senior-pillar technical">
+          <div class="pillar-header">🔬 TECHNICAL MASTERY</div>
+          <ul class="pillar-items">
+            <li class="pillar-item" data-desc="Hiểu Unity dưới mui xe: cơ chế serialization, native/managed memory, custom rendering pass, player loop.">Hiểu Unity sâu</li>
+            <li class="pillar-item" data-desc="Thiết kế hệ thống chạy nhiều năm nhiều người, quản lý nợ kỹ thuật, cấu trúc modular qua Assembly Definitions.">Kiến trúc hệ thống lớn</li>
+            <li class="pillar-item" data-desc="Trở thành chuyên gia đầu ngành (T-shaped) trong một mảng lớn: Gameplay, Tools, Graphics, hay Multiplayer.">Chuyên gia 1 mảng</li>
+            <li class="pillar-item" data-desc="Xây dựng ngân sách hiệu năng (performance budget), tối ưu hóa toàn bộ pipeline asset/runtime CPU/GPU.">Tối ưu cấp hệ thống</li>
+          </ul>
+        </div>
+        <div class="senior-pillar judgement">
+          <div class="pillar-header">⚖️ JUDGEMENT</div>
+          <ul class="pillar-items">
+            <li class="pillar-item" data-desc="Đánh giá trade-off (đánh đổi) rõ ràng giữa đơn giản vs phức tạp, tự phát triển vs mua asset/middleware.">Thấy trade-off</li>
+            <li class="pillar-item" data-desc="Nhìn nhận rủi ro kỹ thuật từ sớm (leak bộ nhớ, crash nền tảng) trước khi triển khai quy mô lớn.">Thấy rủi ro trước</li>
+            <li class="pillar-item" data-desc="Đưa ra quyết định cân nhắc giữa yếu tố kỹ thuật hoàn hảo và ràng buộc thời gian/deadline/nguồn lực.">Cân nhiều ràng buộc</li>
+            <li class="pillar-item" data-desc="Đưa quyết định công nghệ sáng suốt ngay cả khi thông tin không đầy đủ hoặc thiếu tài liệu.">Quyết trong bất định</li>
+          </ul>
+        </div>
+        <div class="senior-pillar leadership">
+          <div class="pillar-header">👥 LEADERSHIP</div>
+          <ul class="pillar-items">
+            <li class="pillar-item" data-desc="Mentor và nâng tầm Junior/Mid-level, biến code review thành hoạt động giảng dạy tích cực và an toàn.">Mentor & nâng team</li>
+            <li class="pillar-item" data-desc="Giải thích và truyền đạt kỹ thuật phức tạp cho Artist, Designer, PM một cách trực quan, dễ hiểu nhất.">Giao tiếp đa chiều</li>
+            <li class="pillar-item" data-desc="Thiết lập coding standard, quy trình CI/CD, chuẩn kiến trúc và dẫn dắt đội ngũ làm theo.">Định chuẩn & dẫn dắt</li>
+            <li class="pillar-item" data-desc="Hiểu sâu sản phẩm game, đặt ưu tiên kỹ thuật đi kèm với mục tiêu thương mại và trải nghiệm người dùng.">Business & Product sense</li>
+          </ul>
+        </div>
+      </div>
+      <div class="pillar-desc-bubble">Nhấp vào một tiêu chí năng lực để xem chi tiết giải thích...</div>
+    </div>
+  `;
+}
+
+function renderPipelineDiagram() {
+  return `
+    <div class="interactive-diagram pipeline-diagram">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">DevOps CI/CD</span>
+        <h3>⚙️ QUY TRÌNH AUTOMATION PIPELINE (CI/CD)</h3>
+      </div>
+      <div class="pipeline-flow-container">
+        <div class="pipeline-flow">
+          <div class="pipeline-stage active" data-desc="1. Push: Đẩy code mới hoặc thay đổi lên repository GitHub/GitLab."><span class="stage-status">●</span> Push</div>
+          <div class="pipeline-connector"></div>
+          <div class="pipeline-stage" data-desc="2. Lint: Tự động chạy tool quét convention code, cảnh báo định dạng sai tiêu chuẩn."><span class="stage-status">○</span> Lint</div>
+          <div class="pipeline-connector"></div>
+          <div class="pipeline-stage" data-desc="3. Compile: Build thử bằng dòng lệnh, phát hiện ngay các lỗi biên dịch C#."><span class="stage-status">○</span> Compile</div>
+          <div class="pipeline-connector"></div>
+          <div class="pipeline-stage" data-desc="4. Unit Test: Tự động chạy tất cả unit test logic thuần độc lập cực nhanh."><span class="stage-status">○</span> Unit Test</div>
+          <div class="pipeline-connector"></div>
+          <div class="pipeline-stage" data-desc="5. Play Test: Chạy các bài test giả lập runtime Unity (kiểm tra va chạm, game loop)."><span class="stage-status">○</span> Play Test</div>
+          <div class="pipeline-connector"></div>
+          <div class="pipeline-stage" data-desc="6. Build: Tự động build đa nền tảng song song (Android APK, iOS, PC, WebGL)."><span class="stage-status">○</span> Build</div>
+          <div class="pipeline-connector"></div>
+          <div class="pipeline-stage" data-desc="7. Perf Test: Chạy test đo FPS, draw call, RAM tự động trên thiết bị thật."><span class="stage-status">○</span> Perf Test</div>
+          <div class="pipeline-connector"></div>
+          <div class="pipeline-stage" data-desc="8. Deploy: Đẩy trực tiếp bản build lên TestFlight, Google Play Console Beta hoặc itch.io."><span class="stage-status">○</span> Deploy</div>
+        </div>
+      </div>
+      <div class="pipeline-action-bar" style="margin-top: 24px; text-align: center;">
+        <button class="run-pipeline-btn" style="background: var(--accent-gradient); color: #fff; padding: 10px 20px; border-radius: var(--radius-md); font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px var(--accent-glow);">▶ Chạy Thử Pipeline</button>
+      </div>
+      <div class="pipeline-desc" style="margin-top: 16px; min-height: 48px;">Nhấp vào một stage để xem vai trò tự động hóa...</div>
+    </div>
+  `;
+}
+
+function renderFrameLifecycleDiagram() {
+  return `
+    <div class="interactive-diagram frame-lifecycle-diagram">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Frame Loop</span>
+        <h3>🔄 CHU TRÌNH TỐM TẮT MỘT FRAME</h3>
+      </div>
+      <div class="frame-flow-container">
+        <div class="frame-flow">
+          <div class="frame-node active" data-desc="1. Input: Nhận thông điệp phần cứng từ bàn phím, chuột, màn hình cảm ứng.">Input</div>
+          <div class="frame-arrow">➔</div>
+          <div class="frame-node" data-desc="2. Update(): Gọi logic kịch bản game, đếm thời gian, chạy cooldown mỗi frame.">Update()</div>
+          <div class="frame-arrow">➔</div>
+          <div class="frame-node" data-desc="3. Physics: Mô phỏng vật lý FixedUpdate(), va chạm trong hệ thống vật lý.">Physics</div>
+          <div class="frame-arrow">➔</div>
+          <div class="frame-node" data-desc="4. Animation: Cập nhật biến dạng xương, cập nhật chuyển động cho sprite.">Animation</div>
+          <div class="frame-arrow">➔</div>
+          <div class="frame-node" data-desc="5. LateUpdate(): Xử lý logic bám camera sau khi nhân vật đã di chuyển xong ở Update().">LateUpdate()</div>
+          <div class="frame-arrow">➔</div>
+          <div class="frame-node text-accent" data-desc="6. Rendering: Gửi thông điệp draw calls đến GPU để vẽ toàn bộ mesh/texture lên màn hình.">Rendering</div>
+        </div>
+      </div>
+      <div class="frame-desc" style="margin-top: 20px; font-weight: 500;">Nhấp vào mỗi giai đoạn để xem cách hoạt động...</div>
+    </div>
+  `;
+}
+
+function renderGitTreeDiagram() {
+  return `
+    <div class="interactive-diagram git-tree-diagram">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Git Visual</span>
+        <h3>🌿 SƠ ĐỒ NHÁNH CODE (GIT BRANCHING)</h3>
+      </div>
+      <div class="git-tree-container">
+        <div class="git-branch main-branch">
+          <span class="git-badge badge-main">main</span>
+          <div class="git-commits">
+            <span class="git-commit active" data-desc="C1 (Commit 1): Bản build nền móng đầu tiên hoạt động ổn định.">C1</span>
+            <span class="git-commit" data-desc="C2 (Commit 2): Merge nhánh feature/inventory sau khi đã review sạch lỗi.">C2</span>
+            <span class="git-commit" data-desc="C3 (Commit 3): Merge nhánh bugfix/jump-glitch khẩn cấp sửa lỗi kẹt đất.">C3</span>
+          </div>
+        </div>
+        <div class="git-branch feature-branch">
+          <span class="git-badge badge-feature">feature/inventory</span>
+          <div class="git-commits">
+            <span class="git-commit" data-desc="C4 (Commit 4): Dựng cấu trúc Item dữ liệu thô và cơ sở dữ liệu vật phẩm.">C4</span>
+            <span class="git-commit" data-desc="C5 (Commit 5): Hoàn thiện giao diện UI ô chứa đồ và tính năng nhặt đồ.">C5</span>
+          </div>
+        </div>
+        <div class="git-branch bugfix-branch">
+          <span class="git-badge badge-bugfix">bugfix/jump-glitch</span>
+          <div class="git-commits">
+            <span class="git-commit" data-desc="C6 (Commit 6): Sửa lại Ground Check bằng Raycast thay thế cho BoxCollider chạm đất.">C6</span>
+          </div>
+        </div>
+      </div>
+      <div class="git-desc" style="margin-top: 20px; font-weight: 500;">Nhấp vào một commit (C1, C2...) để xem nội dung cập nhật...</div>
+    </div>
+  `;
+}
+
+function renderDesignLoopDiagram() {
+  return `
+    <div class="interactive-diagram design-loop-diagram">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Design Loop</span>
+        <h3>🔄 VÒNG LẶP PROTOTYPE VÀ KIỂM THỬ TRONG GAME DESIGN</h3>
+      </div>
+      <div class="design-loop">
+        <div class="loop-node active" data-desc="Ý TƯỞNG: Nghĩ ra ý tưởng cơ chế gameplay cốt lõi (Core Loop) độc đáo trên giấy.">Ý tưởng</div>
+        <div class="loop-arrow">➔</div>
+        <div class="loop-node" data-desc="PROTOTYPE: Dựng thật nhanh bằng khối thô (Cube, Sphere) để chơi thử, không cần đồ họa đẹp.">Prototype thô</div>
+        <div class="flow-split-container">
+          <div class="split-arrow-down">▼</div>
+          <div class="loop-node test-node" data-desc="TEST: Chơi thử nhiều lần và mời người ngoài test để trả lời câu hỏi cốt lõi: NÓ CÓ VUI KHÔNG?">Kiểm thử (Test)</div>
+          <div class="split-yes-no">
+            <div class="split-no" data-desc="❌ KHÔNG VUI: Dũng cảm chỉnh sửa thông số, thay đổi cơ chế hoặc bỏ hẳn ý tưởng để làm cái mới. Tránh tiếc công (sunk cost bias).">❌ Không Vui (Đổi/Bỏ)</div>
+            <div class="split-yes" data-desc="✅ VUI: Tiến hành mở rộng thêm màn chơi, thêm art, audio, hoàn thiện UI và sẵn sàng đóng gói phát hành.">✅ Vui (Mở rộng & Ship)</div>
+          </div>
+        </div>
+      </div>
+      <div class="design-loop-desc" style="margin-top: 20px; font-weight: 500;">Nhấp vào các hộp quy trình để xem chi tiết triết lý làm game...</div>
+    </div>
+  `;
+}
+
+function renderMarketingRoadmapDiagram() {
+  return `
+    <div class="interactive-diagram marketing-roadmap-diagram">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Indie Marketing</span>
+        <h3>📢 LỘ TRÌNH TIẾP THỊ GAME (MARKETING TIMELINE)</h3>
+      </div>
+      <div class="marketing-timeline-steps">
+        <div class="m-step active" data-desc="1. Bắt đầu làm game: Tạo cộng đồng sớm, chia sẻ devlog, ảnh chụp GIF cơ chế độc đáo lên Twitter/Reddit để thu hút fan đầu tiên.">
+          <div class="m-step-header"><span class="m-step-dot"></span> Bắt đầu làm game</div>
+        </div>
+        <div class="m-step" data-desc="2. Có Vertical Slice (bản chơi thử đẹp mắt): Lập trang Steam Store ngay, tung teaser trailer, kêu gọi wishlist để đo nhu cầu thị trường.">
+          <div class="m-step-header"><span class="m-step-dot"></span> Có Vertical Slice</div>
+        </div>
+        <div class="m-step" data-desc="3. Giai đoạn Production: Đăng bài đều đặn hàng tuần (#screenshotsaturday), đem game đi dự các hội chợ hoặc Steam Next Fest với bản Demo chất lượng nhất.">
+          <div class="m-step-header"><span class="m-step-dot"></span> Production</div>
+        </div>
+        <div class="m-step" data-desc="4. Trước khi ra mắt (Launch): Gửi key/build chơi thử sớm cho báo chí, YouTuber, streamer nổi bật trước ngày ra mắt khoảng 2 tuần.">
+          <div class="m-step-header"><span class="m-step-dot"></span> Trước Launch</div>
+        </div>
+        <div class="m-step" data-desc="5. Ra mắt (Launch Day): Tận dụng momentum từ wishlist tích lũy, ra mắt kèm sale nhẹ thu hút lượt mua ban đầu để thuật toán Steam đẩy tiếp cận.">
+          <div class="m-step-header"><span class="m-step-dot"></span> Launch</div>
+        </div>
+        <div class="m-step" data-desc="6. Hậu ra mắt (Post-launch): Hỗ trợ cập nhật sửa lỗi nhanh, ra mắt nội dung mới (DLC), duy trì cộng đồng để nuôi wishlist dài lâu.">
+          <div class="m-step-header"><span class="m-step-dot"></span> Hậu Launch</div>
+        </div>
+      </div>
+      <div class="marketing-desc" style="margin-top: 20px; font-weight: 500;">Nhấp vào từng cột mốc thời gian để xem chỉ dẫn chi tiết...</div>
+    </div>
+  `;
+}
+
+function renderInterviewStepsDiagram() {
+  return `
+    <div class="interactive-diagram interview-steps-diagram">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Tuyển dụng</span>
+        <h3>💼 QUY TRÌNH 6 BƯỚC PHỎNG VẤN GAME STUDIO</h3>
+      </div>
+      <div class="interview-flow">
+        <div class="int-step active" data-desc="Bước 1: Duyệt hồ sơ (CV + Portfolio). Portfolio chứa các bản build game chơi được là yếu tố quyết định 80% cơ hội gọi phỏng vấn.">1. Screening</div>
+        <div class="int-step" data-desc="Bước 2: Bài test kỹ thuật. Hoàn thiện một mini game Unity theo yêu cầu hoặc giải đề thi thuật toán C# trong 3-7 ngày.">2. Coding Test</div>
+        <div class="int-step" data-desc="Bước 3: Phỏng vấn kỹ thuật. Thảo luận sâu kiến thức lập trình C#, Unity lifecycle, cách quản lý bộ nhớ và debug portfolio.">3. Tech Interview</div>
+        <div class="int-step" data-desc="Bước 4: Thiết kế hệ thống (Mid+). Thử thách thiết kế cấu trúc cho một hệ thống game lớn (Ví dụ: thiết kế game multiplayer).">4. System Design</div>
+        <div class="int-step" data-desc="Bước 5: Culture Fit. Trao đổi cùng HR và PM xem tính cách, cách giao tiếp có phù hợp với văn hóa làm việc của studio.">5. Culture Fit</div>
+        <div class="int-step" data-desc="Bước 6: Gặp gỡ ban giám đốc hoặc Tech Director để thảo luận đãi ngộ và trao offer gia nhập studio.">6. Final Round</div>
+      </div>
+      <div class="interview-desc" style="margin-top: 20px; font-weight: 500;">Nhấp vào một bước bất kỳ để xem chi tiết cách chuẩn bị...</div>
+    </div>
+  `;
+}
+
+function renderCareerBranchingDiagram() {
+  return `
+    <div class="interactive-diagram career-branching-diagram">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Career Path</span>
+        <h3>🧭 CÁC HƯỚNG PHÁT TRIỂN SỰ NGHIỆP UNITY DEV</h3>
+      </div>
+      <div class="career-tree">
+        <div class="career-level active" data-desc="Junior Dev: Học code sạch, nắm chắc patterns cơ bản, dùng ScriptableObject linh hoạt và tự làm game nhỏ.">Junior</div>
+        <div class="career-arrow">➔</div>
+        <div class="career-level" data-desc="Mid-Level Dev: Tự tay code module lớn, thiết kế kiến trúc lỏng (DI), tối ưu hiệu năng và làm quen CI/CD.">Mid-Level</div>
+        <div class="career-arrow">➔</div>
+        <div class="career-level" data-desc="Senior Dev: Quyết định kiến trúc hệ thống, kiểm soát technical debt, tối ưu hệ thống sâu và mentor team.">Senior</div>
+        <div class="career-branches">
+          <div class="career-branch-line"></div>
+          <div class="career-branch-nodes">
+            <div class="career-branch-node" data-desc="Tech Lead / Architect / EM: Quản lý kỹ thuật và nhân sự, thiết kế giải pháp công nghệ vĩ mô cho dự án lớn.">⚔️ Tech Lead / EM</div>
+            <div class="career-branch-node" data-desc="Staff / Principal Engineer: Đi sâu vào con đường chuyên gia kỹ thuật vĩ đại, giải quyết native crash, platform bugs.">🔬 Staff Specialist</div>
+            <div class="career-branch-node" data-desc="Indie Founder: Tự ship game độc lập, tự chủ tài chính sản phẩm và làm chủ toàn bộ vòng đời kinh doanh game.">⛵ Indie Founder</div>
+          </div>
+        </div>
+      </div>
+      <div class="career-desc" style="margin-top: 20px; font-weight: 500;">Nhấp vào các chức danh để xem hướng đi và trách nhiệm tương ứng...</div>
+    </div>
+  `;
+}
+
+function renderUnityHierarchyDiagram() {
+  return `
+    <div class="interactive-diagram unity-hierarchy-diagram">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Unity Hierarchy</span>
+        <h3>🎮 GIẢ LẬP HIERARCHY WINDOW & CẤU TRÚC ENTITY</h3>
+      </div>
+      <div class="hierarchy-window-wrapper">
+        <div class="hierarchy-window">
+          <div class="hierarchy-title">📁 Unity Hierarchy View</div>
+          <div class="hierarchy-nodes">
+            <div class="h-node root-node active" data-desc="Entity: Lớp đối tượng cha trừu tượng cao nhất đại diện cho tất cả vật thể động trong game."><span class="h-toggle">▼</span> 📁 Entity</div>
+            <div class="h-node child-node" data-desc="Character: Nhóm nhân vật, kế thừa từ Entity, có thuộc tính lượng máu, trạng thái và tốc độ."><span class="h-toggle">▼</span> 📁 Character</div>
+            <div class="h-node grandchild-node" data-desc="Player: Đối tượng nhân vật do người chơi trực tiếp điều khiển qua phím/chuột.">🎮 Player</div>
+            <div class="h-node grandchild-node" data-desc="Enemy: Nhóm đối tượng kẻ địch tự động di chuyển do máy tính kiểm soát (AI)."><span class="h-toggle">▼</span> 📁 Enemy</div>
+            <div class="h-node great-grandchild-node" data-desc="FlyingEnemy: Loại quái có thể bay lơ lửng trên không trung, bỏ qua va chạm địa hình thấp.">🛸 FlyingEnemy</div>
+            <div class="h-node great-grandchild-node" data-desc="SwimmingEnemy: Loại quái bơi lội dưới nước, chịu tác động của lực cản chất lưu.">🐟 SwimmingEnemy</div>
+          </div>
+        </div>
+      </div>
+      <div class="hierarchy-desc" style="margin-top: 20px; font-weight: 500;">Nhấp vào một GameObject giả lập để xem ý nghĩa kế thừa...</div>
+    </div>
+  `;
+}
+
+function renderPhysicsPipelineDiagram() {
+  return `
+    <div class="interactive-diagram physics-pipeline-diagram">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Physics Loop</span>
+        <h3>⚙️ CHU TRÌNH VẬT LÝ TRONG FIXEDUPDATE()</h3>
+      </div>
+      <div class="physics-flow-list-wrapper">
+        <div class="physics-flow-list">
+          <div class="p-flow-step active" data-desc="1. FixedUpdate() của bạn: Code C# thêm lực (AddForce) hoặc gán vận tốc (velocity) trực tiếp vào Rigidbody.">
+            <span class="p-step-num">1</span>
+            <span>FixedUpdate() Code</span>
+          </div>
+          <div class="p-flow-connector">➔</div>
+          <div class="p-flow-step" data-desc="2. Engine di chuyển Rigidbody: Unity Engine tự động tính toán lực cản, ma sát, gia tốc để thay đổi vị trí.">
+            <span class="p-step-num">2</span>
+            <span>Engine di chuyển</span>
+          </div>
+          <div class="p-flow-connector">➔</div>
+          <div class="p-flow-step" data-desc="3. Phát hiện va chạm (Collision Detection): Engine quét các Collider xem có giao nhau hay xuyên qua nhau không.">
+            <span class="p-step-num">3</span>
+            <span>Quét va chạm</span>
+          </div>
+          <div class="p-flow-connector">➔</div>
+          <div class="p-flow-step" data-desc="4. Giải quyết va chạm: Tự động tính toán phản lực, đẩy các vật thể đặc ra ngoài nhau để tránh xuyên tường.">
+            <span class="p-step-num">4</span>
+            <span>Giải quyết đẩy/lực</span>
+          </div>
+          <div class="p-flow-connector">➔</div>
+          <div class="p-flow-step" data-desc="5. Gọi Event va chạm: Trình duyệt Unity gọi các hàm OnCollisionEnter, OnTriggerEnter... trên MonoBehaviour của bạn.">
+            <span class="p-step-num">5</span>
+            <span>Gọi Event va chạm</span>
+          </div>
+        </div>
+      </div>
+      <div class="physics-desc" style="margin-top: 20px; font-weight: 500;">Nhấp vào từng bước để theo dõi chi tiết hoạt động của Physics Engine...</div>
+    </div>
+  `;
+}
+
+function renderParentChildDiagram() {
+  return `
+    <div class="interactive-diagram parent-child-diagram">
+      <div class="overview-header" style="margin-bottom: 20px;">
+        <span class="diagram-badge">Transform Hierarchy</span>
+        <h3>📍 CẤU TRÚC CHA-CON (PARENT-CHILD TRANSFORM)</h3>
+      </div>
+      <div class="parent-child-box-wrapper">
+        <div class="parent-child-box">
+          <div class="visual-parent-node active" data-desc="Player (Cha): Đối tượng chính di chuyển trong Scene (Ví dụ X: 10, Y: 5). Nếu Player di chuyển, toàn bộ con sẽ di chuyển theo.">
+            <span>👨 Player (Cha)</span>
+            <div class="visual-child-node" data-desc="Hand (Con): Tọa độ tương đối so với Cha (Ví dụ X: 1, Y: 0). Hand xoay thì Torch cũng tự động xoay quanh Hand.">
+              <span>✋ Hand (Con)</span>
+              <div class="visual-grandchild-node" data-desc="Torch (Cháu): Tọa độ tương đối so với Hand (Ví dụ X: 0.5, Y: 0.5). Gắn đuốc vào tay nhân vật cực kỳ đơn giản và tự động.">
+                <span>🔥 Torch (Cháu)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="parent-child-desc" style="margin-top: 20px; font-weight: 500;">Nhấp vào các đối tượng (Cha, Con, Cháu) để xem cơ chế di chuyển kế thừa...</div>
     </div>
   `;
 }

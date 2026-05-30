@@ -155,8 +155,15 @@ export function setActiveItem(path) {
   const allItems = document.querySelectorAll('.nav-item');
   allItems.forEach(item => item.classList.remove('active'));
 
+  let lookupPath = path;
+  if (path && path.startsWith('book/read/')) {
+    const parts = path.split('/');
+    const catName = parts[2];
+    lookupPath = `book/category/${catName}.md`;
+  }
+
   // Find and activate the matching item
-  const activeItem = document.querySelector(`.nav-item[data-path="${path}"]`);
+  const activeItem = document.querySelector(`.nav-item[data-path="${lookupPath}"]`);
   if (activeItem) {
     activeItem.classList.add('active');
 

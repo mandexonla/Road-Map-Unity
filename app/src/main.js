@@ -9,6 +9,7 @@ import { initSidebar, setActiveItem, updateSidebarProgress } from './sidebar.js'
 import { initProgress, getCheckboxState, setCheckboxState, getTotalProgress, getBookProgress, setBookProgress, clearBookProgress } from './progress.js';
 import { initSearch } from './search.js';
 import { initSkillTree } from './skilltree.js';
+import { initTOC } from './toc.js';
 
 // ── Constants ────────────────────────────────────────────────────
 const BASE_PATH = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
@@ -128,6 +129,9 @@ function postRender(path) {
 
   // Restore checkbox states
   restoreCheckboxes(path);
+
+  // Render Table of Contents
+  initTOC(path);
 
   // Render mermaid diagrams
   renderMermaidDiagrams();
