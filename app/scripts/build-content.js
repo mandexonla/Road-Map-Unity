@@ -291,6 +291,14 @@ function build() {
   }
   fs.writeFileSync(INDEX_FILE, JSON.stringify(index, null, 2), 'utf-8');
 
+  // ── Copy unity-docs-map.json ───────────────────────────────────────────
+  const mapSrc = path.resolve(ROOT_DIR, '08-Knowledge-Base', 'unity-docs-map.json');
+  const mapDest = path.resolve(__dirname, '..', 'public', 'unity-docs-map.json');
+  if (fs.existsSync(mapSrc)) {
+    fs.copyFileSync(mapSrc, mapDest);
+    console.log(`   📄 Copied unity-docs-map.json to public/unity-docs-map.json`);
+  }
+
   console.log(`   ✅ Built index with ${sections.length} sections, ${totalFiles} markdown files.`);
   console.log(`   📚 Scanned ${totalBooks} books across ${Object.keys(books).length} categories.`);
   console.log(`   📄 ${INDEX_FILE}`);

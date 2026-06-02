@@ -15,6 +15,7 @@ import { initTOC } from './toc.js';
 const BASE_PATH = (import.meta.env.BASE_URL || '/').replace(/\/$/, '');
 
 let contentIndex = null;
+let unityDocsMap = null;
 
 // ── Bootstrap ────────────────────────────────────────────────────
 
@@ -37,6 +38,17 @@ async function init() {
     console.error('Failed to load content index:', err);
     showFatalError();
     return;
+  }
+
+  // 4.1 Fetch Unity Docs Map
+  try {
+    const res = await fetch(`${BASE_PATH}/unity-docs-map.json`);
+    if (res.ok) {
+      unityDocsMap = await res.json();
+      window.unityDocsMap = unityDocsMap;
+    }
+  } catch (err) {
+    console.warn('Failed to load unity-docs-map.json:', err);
   }
 
   // 5. Sidebar navigation
@@ -109,7 +121,21 @@ async function handleNavigation(path) {
     } else if (path === '08-Knowledge-Base/README.md') {
       contentEl.innerHTML = renderKnowledgeBaseHome(contentIndex);
     } else {
-      contentEl.innerHTML = renderMarkdown(mdContent, path);
+      let html = renderMarkdown(mdContent, path);
+      const filename = path.split('/').pop();
+      const pageId = filename.replace(/\.md$/i, '');
+      if (unityDocsMap && unityDocsMap[pageId]) {
+        const cardHtml = renderUnityDocsCard(pageId, unityDocsMap[pageId]);
+        // Insert cardHtml right after the h1 tag if present, or at the very top
+        const h1Match = html.match(/(<h1[^>]*>.*?<\/h1>)/i);
+        if (h1Match) {
+          const h1Tag = h1Match[1];
+          html = html.replace(h1Tag, `${h1Tag}\n${cardHtml}`);
+        } else {
+          html = cardHtml + html;
+        }
+      }
+      contentEl.innerHTML = html;
     }
 
     // Post-render hooks
@@ -140,6 +166,9 @@ function postRender(path) {
 
   // Render mermaid diagrams
   renderMermaidDiagrams();
+
+  // Set up Unity Docs card events if present
+  setupUnityDocsCardEvents(path);
 
   // Scroll to top (or to hash anchor)
   const hash = window.location.hash;
@@ -1049,6 +1078,135 @@ function countSectionFiles(section) {
 function escapeHtml(str) {
   const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
   return String(str).replace(/[&<>"']/g, c => map[c]);
+}
+
+// ── Unity Docs Card Helpers ──────────────────────────────────────
+
+function renderUnityDocsCard(pageId, data) {
+  const manuals = (data.manual || []).map(item => {
+    const searchUrl = `https://docs.unity3d.com/Manual/${encodeURIComponent(item.replace(/\s+/g, ''))}.html`;
+    return `<li><a href="${searchUrl}" target="_blank" rel="noopener noreferrer">📖 Unity Manual: ${item}</a></li>`;
+  }).join('');
+
+  const apis = (data.api || []).map(item => {
+    const searchUrl = `https://docs.unity3d.com/ScriptReference/${encodeURIComponent(item.replace(/\s+/g, ''))}.html`;
+    return `<li><a href="${searchUrl}" target="_blank" rel="noopener noreferrer" class="api-code-link"><code>${item}</code></a></li>`;
+  }).join('');
+
+  const practices = (data.practice || []).map((item, idx) => {
+    const checkKey = `practice-${pageId}-${idx}`;
+    return `
+      <div class="practice-check-item">
+        <label class="checkbox-container">
+          <input type="checkbox" id="${checkKey}" data-practice-key="${checkKey}">
+          <span class="checkmark"></span>
+          <span class="practice-text">${escapeHtml(item)}</span>
+        </label>
+      </div>
+    `;
+  }).join('');
+
+  const checklists = (data.checklist || []).map(item => `<li>💡 ${escapeHtml(item)}</li>`).join('');
+
+  return `
+    <div class="unity-docs-learning-card" id="unity-docs-card-${pageId}">
+      <div class="card-badge">
+        <span class="badge-level">${data.level}</span>
+        <span class="badge-topic">OFFICIAL DOCS PATHWAY</span>
+      </div>
+      <h3 class="card-heading">🎯 BẢN ĐỒ HỌC UNITY DOCS</h3>
+      
+      <div class="card-tabs">
+        <button class="card-tab-btn active" data-tab="docs">📖 Tài Liệu Cần Đọc</button>
+        <button class="card-tab-btn" data-tab="checklist">💡 Cần Hiểu Đúng</button>
+        <button class="card-tab-btn" data-tab="practice">🏆 Thử Thách Thực Hành</button>
+      </div>
+      
+      <div class="card-tab-content active" data-tab-content="docs">
+        <div class="docs-section">
+          <h4>📚 Tài liệu chính chủ:</h4>
+          <ul>${manuals}</ul>
+        </div>
+        <div class="docs-section" style="margin-top: 15px;">
+          <h4>💻 Scripting API cần biết:</h4>
+          <ul>${apis}</ul>
+        </div>
+      </div>
+      
+      <div class="card-tab-content" data-tab-content="checklist">
+        <div class="checklist-section">
+          <h4>⚠️ Ghi nhớ quan trọng để tránh Bug:</h4>
+          <ul>${checklists}</ul>
+        </div>
+      </div>
+      
+      <div class="card-tab-content" data-tab-content="practice">
+        <div class="practice-section">
+          <h4>🎯 Hoàn thành thử thách sau để vượt qua bài học:</h4>
+          <div class="practice-list">${practices}</div>
+          <div class="practice-progress-bar">
+            <div class="practice-progress-fill" id="practice-progress-fill-${pageId}" style="width: 0%"></div>
+          </div>
+          <span class="practice-progress-text" id="practice-progress-text-${pageId}">Tiến độ: 0%</span>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function setupUnityDocsCardEvents(path) {
+  const filename = path.split('/').pop();
+  const pageId = filename.replace(/\.md$/i, '');
+  const card = document.getElementById(`unity-docs-card-${pageId}`);
+  if (!card) return;
+
+  const tabBtns = card.querySelectorAll('.card-tab-btn');
+  const tabContents = card.querySelectorAll('.card-tab-content');
+  
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tabName = btn.dataset.tab;
+      
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      
+      btn.classList.add('active');
+      card.querySelector(`.card-tab-content[data-tab-content="${tabName}"]`).classList.add('active');
+    });
+  });
+
+  const checkboxes = card.querySelectorAll('input[type="checkbox"]');
+  
+  function updatePracticeProgress() {
+    const total = checkboxes.length;
+    if (total === 0) return;
+    let checkedCount = 0;
+    checkboxes.forEach(cb => {
+      if (cb.checked) checkedCount++;
+    });
+    
+    const percentage = Math.round((checkedCount / total) * 100);
+    const fill = document.getElementById(`practice-progress-fill-${pageId}`);
+    const text = document.getElementById(`practice-progress-text-${pageId}`);
+    
+    if (fill) fill.style.width = `${percentage}%`;
+    if (text) text.innerText = `Tiến độ thử thách: ${percentage}% (đã đạt ${checkedCount}/${total})`;
+  }
+
+  checkboxes.forEach(cb => {
+    const key = cb.dataset.practiceKey;
+    const saved = localStorage.getItem(`unity-roadmap-${key}`);
+    if (saved === 'true') {
+      cb.checked = true;
+    }
+    
+    cb.addEventListener('change', () => {
+      localStorage.setItem(`unity-roadmap-${key}`, cb.checked ? 'true' : 'false');
+      updatePracticeProgress();
+    });
+  });
+
+  updatePracticeProgress();
 }
 
 // ── Start Application ────────────────────────────────────────────

@@ -1,0 +1,96 @@
+{
+  "gameobject-component": {
+    "level": "Intern",
+    "manual": [
+      "GameObjects",
+      "Components",
+      "Transform"
+    ],
+    "api": [
+      "GameObject",
+      "Component",
+      "Transform"
+    ],
+    "practice": [
+      "Tạo scene có Player, Ground, Camera.",
+      "Player có Transform, SpriteRenderer, Rigidbody2D, Collider2D.",
+      "Tìm Component bằng Inspector và bằng code."
+    ],
+    "checklist": [
+      "GameObject tự nó không làm gì nếu không có Component.",
+      "Transform luôn tồn tại trên mọi GameObject.",
+      "Component không nên bị hiểu như class bình thường trong C# thuần."
+    ]
+  },
+  "monobehaviour-lifecycle": {
+    "level": "Intern",
+    "manual": [
+      "Execution Order of Event Functions",
+      "MonoBehaviour"
+    ],
+    "api": [
+      "Awake",
+      "Start",
+      "Update",
+      "FixedUpdate",
+      "LateUpdate",
+      "OnEnable",
+      "OnDisable",
+      "OnDestroy"
+    ],
+    "practice": [
+      "Viết script log lại toàn bộ vòng đời của MonoBehaviour theo thứ tự.",
+      "Di chuyển vật thể trong FixedUpdate thay vì Update để so sánh độ mượt."
+    ],
+    "checklist": [
+      "Awake chạy trước Start, ngay cả khi script bị disable (nhưng GameObject phải active).",
+      "Update chạy mỗi frame (phụ thuộc FPS), FixedUpdate chạy theo chu kỳ vật lý cố định.",
+      "Không bao giờ khởi tạo MonoBehaviour bằng từ khóa 'new'."
+    ]
+  },
+  "transform": {
+    "level": "Intern",
+    "manual": [
+      "Transforms",
+      "Parent-Child Relationship"
+    ],
+    "api": [
+      "Transform.position",
+      "Transform.rotation",
+      "Transform.localScale",
+      "Transform.Translate",
+      "Transform.Rotate",
+      "Transform.parent"
+    ],
+    "practice": [
+      "Di chuyển vật thể bằng cách cộng dồn Vector3 vào transform.position.",
+      "Xoay vật thể liên tục quanh trục Z bằng transform.Rotate."
+    ],
+    "checklist": [
+      "position và rotation là Global, còn localPosition và localRotation là Relative so với cha.",
+      "Thay đổi transform trực tiếp mỗi frame có thể làm đứt gãy hệ thống vật lý nếu object có Rigidbody (dùng Rigidbody.MovePosition thay thế).",
+      "Di chuyển bằng Translate cần nhân với Time.deltaTime để tránh phụ thuộc vào FPS."
+    ]
+  },
+  "instantiate-destroy": {
+    "level": "Intern",
+    "manual": [
+      "Instantiating Prefabs",
+      "Object.Destroy"
+    ],
+    "api": [
+      "Object.Instantiate",
+      "Object.Destroy",
+      "DontDestroyOnLoad"
+    ],
+    "practice": [
+      "Tạo một spawner liên tục sinh ra đạn (Instantiate) khi nhấn Space.",
+      "Hủy đạn sau 2 giây (Destroy) để tránh tràn bộ nhớ."
+    ],
+    "checklist": [
+      "Instantiate và Destroy là các tác vụ nặng, không nên spam liên tục trong game thực tế (sử dụng Object Pooling).",
+      "Destroy không xóa object ngay lập tức mà đánh dấu để xóa ở cuối frame hiện tại.",
+      "DontDestroyOnLoad giúp giữ các Manager (GameManager, SoundManager) sống qua các scene."
+    ]
+  }
+}

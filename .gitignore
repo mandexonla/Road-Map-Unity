@@ -20,6 +20,7 @@ Thumbs.db
 app/public/Book/
 app/public/content/
 app/public/content-index.json
+app/public/unity-docs-map.json
 
 # Local agent / temp
 .claude/
