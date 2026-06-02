@@ -22,6 +22,10 @@ app/public/content/
 app/public/content-index.json
 app/public/unity-docs-map.json
 
+# Offline Documentation
+UnityDocumentation/
+app/public/UnityDocumentation/
+
 # Local agent / temp
 .claude/
 

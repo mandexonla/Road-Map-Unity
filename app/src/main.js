@@ -1085,12 +1085,30 @@ function escapeHtml(str) {
 function renderUnityDocsCard(pageId, data) {
   const manuals = (data.manual || []).map(item => {
     const searchUrl = `https://docs.unity3d.com/Manual/${encodeURIComponent(item.replace(/\s+/g, ''))}.html`;
-    return `<li><a href="${searchUrl}" target="_blank" rel="noopener noreferrer">📖 Unity Manual: ${item}</a></li>`;
+    const localUrl = `${BASE_PATH}/UnityDocumentation/Documentation/en/Manual/${encodeURIComponent(item.replace(/\s+/g, ''))}.html`;
+    return `
+      <li class="docs-item">
+        <span>📖 Unity Manual: <strong>${item}</strong></span>
+        <div class="docs-link-group">
+          <a href="${searchUrl}" target="_blank" rel="noopener noreferrer" class="docs-link-btn online">🌐 Online</a>
+          <a href="${localUrl}" target="_blank" rel="noopener noreferrer" class="docs-link-btn offline">🔌 Offline</a>
+        </div>
+      </li>
+    `;
   }).join('');
 
   const apis = (data.api || []).map(item => {
     const searchUrl = `https://docs.unity3d.com/ScriptReference/${encodeURIComponent(item.replace(/\s+/g, ''))}.html`;
-    return `<li><a href="${searchUrl}" target="_blank" rel="noopener noreferrer" class="api-code-link"><code>${item}</code></a></li>`;
+    const localUrl = `${BASE_PATH}/UnityDocumentation/Documentation/en/ScriptReference/${encodeURIComponent(item.replace(/\s+/g, ''))}.html`;
+    return `
+      <li class="docs-item">
+        <span>💻 Scripting API: <code>${item}</code></span>
+        <div class="docs-link-group">
+          <a href="${searchUrl}" target="_blank" rel="noopener noreferrer" class="docs-link-btn online">🌐 Online</a>
+          <a href="${localUrl}" target="_blank" rel="noopener noreferrer" class="docs-link-btn offline">🔌 Offline</a>
+        </div>
+      </li>
+    `;
   }).join('');
 
   const practices = (data.practice || []).map((item, idx) => {
@@ -1125,11 +1143,11 @@ function renderUnityDocsCard(pageId, data) {
       <div class="card-tab-content active" data-tab-content="docs">
         <div class="docs-section">
           <h4>📚 Tài liệu chính chủ:</h4>
-          <ul>${manuals}</ul>
+          <ul style="display: grid; gap: 8px;">${manuals}</ul>
         </div>
-        <div class="docs-section" style="margin-top: 15px;">
+        <div class="docs-section" style="margin-top: 20px;">
           <h4>💻 Scripting API cần biết:</h4>
-          <ul>${apis}</ul>
+          <ul style="display: grid; gap: 8px;">${apis}</ul>
         </div>
       </div>
       
