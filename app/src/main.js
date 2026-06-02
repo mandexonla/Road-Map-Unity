@@ -104,6 +104,10 @@ async function handleNavigation(path) {
         initHomeProfile();
         initSkillTree(contentIndex);
       }, 0);
+    } else if (isRoadmapLevelReadme(path)) {
+      contentEl.innerHTML = renderLevelPage(mdContent, path, contentIndex);
+    } else if (path === '08-Knowledge-Base/README.md') {
+      contentEl.innerHTML = renderKnowledgeBaseHome(contentIndex);
     } else {
       contentEl.innerHTML = renderMarkdown(mdContent, path);
     }
@@ -326,6 +330,116 @@ function getCurrentLevel(percentage) {
   if (percentage >= 50) return 'Level 3: Mid-Level';
   if (percentage >= 25) return 'Level 2: Junior';
   return 'Level 1: Intern';
+}
+
+function isRoadmapLevelReadme(path) {
+  return /^0[1-4]-[^/]+\/README\.md$/.test(path);
+}
+
+function renderLevelPage(mdContent, path, index) {
+  const renderedMd = renderMarkdown(mdContent, path);
+  const sectionId = path.split('/')[0];
+  const section = (index.sections || []).find(item => item.id === sectionId);
+
+  if (!section) return renderedMd;
+
+  const tabs = [
+    { id: 'README', label: 'Tổng quan', desc: 'Bức tranh level, mục tiêu và phạm vi cần nắm.' },
+    { id: 'skills', label: 'Kỹ năng', desc: 'Kiến thức cốt lõi cần hiểu thật chắc.' },
+    { id: 'projects', label: 'Dự án', desc: 'Bài thực hành để biến kiến thức thành sản phẩm.' },
+    { id: 'checklist', label: 'Checklist', desc: 'Tự đánh giá và lưu tiến độ hoàn thành.' },
+    { id: 'resources', label: 'Tài nguyên', desc: 'Link học thêm, sách, video và tài liệu hỗ trợ.' },
+  ];
+
+  const fileMap = new Map((section.files || []).map(file => [file.id, file]));
+  const quickLinks = tabs
+    .filter(tab => fileMap.has(tab.id))
+    .map(tab => {
+      const file = fileMap.get(tab.id);
+      const activeClass = file.path === path ? ' active' : '';
+      return (
+        `<a class="level-tab${activeClass}" href="#/${file.path.replace(/\.md$/, '')}">` +
+          `<span>${tab.label}</span>` +
+          `<small>${tab.desc}</small>` +
+        `</a>`
+      );
+    })
+    .join('');
+
+  return (
+    `<section class="level-hub">` +
+      `<div class="level-hub-header">` +
+        `<span class="level-hub-kicker">Roadmap level</span>` +
+        `<h1>${escapeHtml(section.title)}</h1>` +
+        `<p>Tất cả nội dung của level này được gom vào một cửa vào duy nhất. Dùng các tab bên dưới để nhảy nhanh tới checklist, dự án, kỹ năng và tài nguyên.</p>` +
+      `</div>` +
+      `<nav class="level-tabs" aria-label="Nội dung trong level">${quickLinks}</nav>` +
+    `</section>` +
+    `<div class="level-content">${renderedMd}</div>`
+  );
+}
+
+function renderKnowledgeBaseHome(index) {
+  const section = (index.sections || []).find(item => item.id === '08-Knowledge-Base');
+  const groups = section?.subsections || [];
+  const featuredIds = new Set([
+    'gameobject-component',
+    'monobehaviour-lifecycle',
+    'transform',
+    'scriptableobject',
+    'object-pooling',
+    'addressables',
+    'memory-model',
+    'rendering-pipeline-internals',
+  ]);
+
+  const groupCards = groups.map(group => {
+    const topics = group.files || [];
+    const sample = topics.slice(0, 5).map(file => (
+      `<a href="#/${file.path.replace(/\.md$/, '')}">${escapeHtml(cleanTitle(file.title))}</a>`
+    )).join('');
+
+    return (
+      `<section class="kb-group-card">` +
+        `<div class="kb-group-heading">` +
+          `<span>${group.icon || '📚'}</span>` +
+          `<div><h2>${escapeHtml(group.title)}</h2><p>${topics.length} chủ đề chi tiết</p></div>` +
+        `</div>` +
+        `<div class="kb-topic-list">${sample}</div>` +
+      `</section>`
+    );
+  }).join('');
+
+  const featured = groups
+    .flatMap(group => group.files || [])
+    .filter(file => featuredIds.has(file.id))
+    .map(file => (
+      `<a class="kb-feature-card" href="#/${file.path.replace(/\.md$/, '')}">` +
+        `<span class="kb-feature-label">Concept</span>` +
+        `<strong>${escapeHtml(cleanTitle(file.title))}</strong>` +
+        `<span>Giải thích bản chất, cách Unity vận hành bên trong, ví dụ code, lỗi hay gặp và best practices.</span>` +
+      `</a>`
+    ))
+    .join('');
+
+  return (
+    `<section class="kb-docs-home">` +
+      `<div class="kb-hero">` +
+        `<span class="kb-kicker">Unity Knowledge Base</span>` +
+        `<h1>Tài liệu Unity tiếng Việt, giải thích tới gốc</h1>` +
+        `<p>Thiết kế theo tinh thần docs Unity: dễ quét, dễ tra cứu, chia theo cấp độ. Khác ở chỗ mỗi bài vẫn đào sâu như roadmap hiện tại: bản chất, engine hoạt động thế nào, ví dụ, trade-off và lỗi thường gặp.</p>` +
+        `<div class="kb-search-strip">Tìm bằng Ctrl+K hoặc chọn nhóm kiến thức bên dưới</div>` +
+      `</div>` +
+      `<div class="kb-feature-grid">${featured}</div>` +
+      `<div class="kb-groups">${groupCards}</div>` +
+    `</section>`
+  );
+}
+
+function cleanTitle(title) {
+  return String(title || '')
+    .replace(/^[\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F\s]+/u, '')
+    .trim();
 }
 
 // ── Breadcrumb ───────────────────────────────────────────────────

@@ -15,6 +15,7 @@ export function initSidebar(contentIndex, onNavigate) {
 
   for (const section of contentIndex.sections) {
     const totalFiles = countSectionFiles(section);
+    const isRoadmapLevel = /^0[1-4]-/.test(section.id);
     html += `<div class="nav-section">`;
     html += `<button class="nav-section-header" data-section-id="${section.id}">`;
     html += `<span class="nav-section-icon">${section.icon || '📁'}</span>`;
@@ -26,8 +27,12 @@ export function initSidebar(contentIndex, onNavigate) {
 
     // Direct files
     if (section.files && section.files.length > 0) {
-      for (const file of section.files) {
-        html += buildNavItem(file);
+      const filesToShow = isRoadmapLevel
+        ? section.files.filter(file => file.id === 'README').slice(0, 1)
+        : section.files;
+
+      for (const file of filesToShow) {
+        html += buildNavItem(file, isRoadmapLevel ? 'Tổng quan level' : null);
       }
     }
 
@@ -116,13 +121,13 @@ export function initSidebar(contentIndex, onNavigate) {
   function openSidebar() {
     if (sidebar) sidebar.classList.add('open');
     if (sidebarOverlay) sidebarOverlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
+    document.body.classList.add('sidebar-open');
   }
 
   function closeSidebar() {
     if (sidebar) sidebar.classList.remove('open');
     if (sidebarOverlay) sidebarOverlay.classList.remove('active');
-    document.body.style.overflow = '';
+    document.body.classList.remove('sidebar-open');
   }
 
   if (menuToggle) {
@@ -154,6 +159,8 @@ export function setActiveItem(path) {
   // Remove active from all items
   const allItems = document.querySelectorAll('.nav-item');
   allItems.forEach(item => item.classList.remove('active'));
+  const allHeaders = document.querySelectorAll('.nav-section-header');
+  allHeaders.forEach(item => item.classList.remove('active-section'));
 
   let lookupPath = path;
   if (path && path.startsWith('book/read/')) {
@@ -175,6 +182,14 @@ export function setActiveItem(path) {
 
     // Scroll into view within the sidebar
     activeItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  } else {
+    const sectionId = path ? path.split('/')[0] : '';
+    const parentHeader = document.querySelector(`.nav-section-header[data-section-id="${sectionId}"]`);
+    const parentSection = parentHeader?.closest('.nav-section');
+    if (parentSection && parentHeader) {
+      parentSection.classList.add('expanded');
+      parentHeader.classList.add('active-section');
+    }
   }
 }
 
@@ -197,10 +212,10 @@ export function updateSidebarProgress(progressData) {
 
 // ── Helpers ──────────────────────────────────────────────────────
 
-function buildNavItem(file) {
+function buildNavItem(file, labelOverride = null) {
   const href = '#/' + file.path.replace(/\.md$/, '');
   const icon = getFileIcon(file.title);
-  const title = file.title || file.id;
+  const title = labelOverride || file.title || file.id;
   return (
     `<a class="nav-item" href="${href}" data-path="${file.path}">` +
       `<span class="nav-item-icon">${icon}</span>` +

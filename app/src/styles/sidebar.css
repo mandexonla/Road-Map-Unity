@@ -194,6 +194,11 @@
   background: var(--bg-hover);
 }
 
+.nav-section-header.active-section {
+  color: var(--accent-light);
+  background: var(--accent-glow);
+}
+
 .nav-section-icon {
   font-size: 1rem;
   line-height: 1;

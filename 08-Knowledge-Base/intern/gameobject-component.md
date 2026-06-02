@@ -6,6 +6,23 @@
 
 ---
 
+## 0. Cách dùng trang này với Unity Docs
+
+Unity Docs gốc là **Scripting API Reference**: nó cho bạn biết class có property/method nào, chữ ký hàm ra sao, dùng được trong phiên bản nào. Nhưng khi mới học, chỉ đọc API thường vẫn bị hụt câu hỏi quan trọng hơn: *tại sao lại dùng cái này, dùng trong tình huống nào, và sai kiểu gì sẽ làm game hỏng?*
+
+Vì vậy bài này dùng Unity Docs làm xương sống API, rồi giải thích lại theo ngữ cảnh làm game:
+
+| Bạn muốn hiểu | Đọc trong bài này | Tra API gốc |
+|---|---|---|
+| Object trong scene là gì | GameObject là container | [GameObject](https://docs.unity3d.com/ScriptReference/GameObject.html) |
+| Component là gì | Component là khả năng gắn vào GameObject | [Component](https://docs.unity3d.com/ScriptReference/Component.html) |
+| Script của bạn nằm ở đâu | MonoBehaviour là Component đặc biệt | [MonoBehaviour](https://docs.unity3d.com/ScriptReference/MonoBehaviour.html) |
+| Vì sao object luôn có vị trí | Transform là component bắt buộc | [Transform](https://docs.unity3d.com/ScriptReference/Transform.html) |
+
+> Cách học khôn: đọc phần giải thích tiếng Việt trước để có mô hình trong đầu, sau đó mở Unity Docs để tra tên hàm chính xác. Đừng học API như từ điển khi chưa hiểu vai trò của nó trong scene.
+
+---
+
 ## 1. Bản chất
 
 **GameObject là một cái "thùng rỗng".** Tự nó **không làm gì cả** — không có hình dạng, không có hành vi, không có vật lý. Nó chỉ là một **vật chứa (container)** có:
@@ -72,6 +89,116 @@ Cần thêm khả năng → **gắn thêm component**. Cần bớt → **gỡ co
 ---
 
 ## 4. Cú pháp & ví dụ
+
+### Bản đồ API cần biết từ Unity Docs
+
+Đây là các API bạn sẽ gặp liên tục. Không cần học thuộc hết, nhưng cần biết **cái nào giải quyết vấn đề nào**.
+
+#### Nhóm định danh object
+
+| API | Dùng để làm gì | Khi nào dùng |
+|---|---|---|
+| `gameObject.name` | Tên object | Debug, log, tổ chức scene. Không nên dùng làm logic chính. |
+| `gameObject.tag` | Nhóm object theo tag | Kiểm tra `Player`, `Enemy`, `Pickup`. |
+| `gameObject.layer` | Layer vật lý/render/raycast | Collision matrix, camera culling, raycast mask. |
+| `gameObject.scene` | Scene chứa object | Tooling, multi-scene, debug. |
+
+**Điểm dễ nhầm:** `tag` dùng cho nhận diện gameplay đơn giản; `layer` thường dùng cho hệ thống engine như physics, raycast, camera. Đừng dùng layer thay tag chỉ vì “cũng là nhóm”.
+
+```csharp
+void OnTriggerEnter(Collider other)
+{
+    if (!other.CompareTag("Pickup")) return;
+    Collect(other.gameObject);
+}
+```
+
+`CompareTag` thường tốt hơn so sánh `other.tag == "Pickup"` vì Unity có kiểm tra tag hợp lệ và tránh một số lỗi string lặt vặt.
+
+#### Nhóm bật/tắt object
+
+| API | Ý nghĩa thực tế |
+|---|---|
+| `SetActive(bool)` | Bật/tắt toàn bộ GameObject theo local state. |
+| `activeSelf` | Object này tự nó đang bật hay tắt. |
+| `activeInHierarchy` | Object có thật sự active trong scene không, tính cả cha mẹ. |
+
+Ví dụ: con `SwordTrail` có `activeSelf = true`, nhưng cha `Player` đang tắt thì `SwordTrail.activeInHierarchy = false`. Đây là lý do đôi khi bạn thấy checkbox con vẫn bật nhưng script không chạy.
+
+```csharp
+public class Pickup : MonoBehaviour
+{
+    [SerializeField] private GameObject visual;
+
+    public void HideAfterCollected()
+    {
+        visual.SetActive(false);      // chỉ tắt phần hình
+        gameObject.SetActive(false);  // tắt toàn bộ pickup nếu không dùng nữa
+    }
+}
+```
+
+#### Nhóm lấy/thêm Component
+
+| API | Khi nào dùng | Ghi chú |
+|---|---|---|
+| `GetComponent<T>()` | Lấy component trên cùng GameObject | Cache nếu dùng nhiều lần. |
+| `TryGetComponent<T>(out T value)` | Lấy component nhưng an toàn khi có thể không tồn tại | Hợp cho va chạm, pickup, optional component. |
+| `GetComponentInChildren<T>()` | Lấy component ở object con | Cẩn thận nếu có nhiều con cùng loại. |
+| `GetComponentInParent<T>()` | Lấy component ở object cha | Hợp khi collider con cần gọi script ở root. |
+| `GetComponents<T>()` | Lấy nhiều component cùng loại | Dùng khi object có nhiều collider/renderer/script module. |
+| `AddComponent<T>()` | Thêm component bằng code | Hợp cho tool/procedural, ít dùng bừa trong gameplay thường. |
+
+```csharp
+public class DamageZone : MonoBehaviour
+{
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.TryGetComponent<Health>(out var health))
+        {
+            health.TakeDamage(10);
+        }
+    }
+}
+```
+
+Tư duy ở đây: `DamageZone` không cần biết object kia là Player, Enemy hay Barrel. Nó chỉ cần biết object đó **có khả năng nhận damage** không. Đây chính là composition.
+
+#### Nhóm tìm object trong scene
+
+| API | Dùng được, nhưng... |
+|---|---|
+| `GameObject.Find` | Tìm theo tên, dễ gãy khi đổi tên object. Tránh dùng trong gameplay chính. |
+| `FindWithTag` / `FindGameObjectsWithTag` | Tạm ổn khi cần tìm object theo tag lúc khởi tạo. |
+| `FindAnyObjectByType` / `FindObjectsByType` | Tiện cho tool/debug/bootstrap, không nên spam mỗi frame. |
+
+Nếu bạn đang viết `Find` trong `Update`, gần như chắc chắn thiết kế đang lệch. Dùng `[SerializeField]`, dependency injection, event, hoặc một registry rõ ràng hơn.
+
+```csharp
+public class CameraFollow : MonoBehaviour
+{
+    [SerializeField] private Transform target;
+
+    private void LateUpdate()
+    {
+        if (!target) return;
+        transform.position = target.position + new Vector3(0, 5, -8);
+    }
+}
+```
+
+Inspector reference thường “nhạt” hơn `Find`, nhưng trong dự án thật nó bền hơn rất nhiều.
+
+#### Nhóm tạo/hủy object
+
+| API | Ý nghĩa |
+|---|---|
+| `Instantiate` | Clone prefab/object. |
+| `Destroy` | Hủy object/component an toàn theo vòng đời runtime. |
+| `DestroyImmediate` | Hủy ngay lập tức, chủ yếu cho editor/tooling; runtime bình thường tránh dùng. |
+| `DontDestroyOnLoad` | Giữ object sống qua scene mới. |
+
+Nhóm này liên quan trực tiếp tới [Instantiate & Destroy](./instantiate-destroy.md) và [Prefab](./prefab.md). Ở level Intern chỉ cần nhớ: tạo/hủy object là thao tác đắt nếu spam liên tục, nên đạn, effect, enemy spawn nhiều thường cần Object Pooling ở level Junior.
 
 ### Truy cập component
 ```csharp
